@@ -1,0 +1,21 @@
+Photo by <a href="https://unsplash.com/@fellowferdi?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Ferdinand Stohr</a> on <a href="https://unsplash.com/images/nature/sunset?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a>
+  
+
+Photo by Ferdinand Stohr on Unsplash
+
+https://unsplash.com/photos/iW1WzbuWMcA
+
+
+https://opengameart.org/content/2d-vegetables
+https://opengameart.org/content/lpc-style-farm-animals
+https://opengameart.org/content/bunny-sprite
+
+Color names in Lua
+
+https://gist.github.com/Lerg/586c387f978121d264d6
+https://www.tug.org/pracjourn/2007-4/walden/color.pdf
+
+
+Coltonoscopy mario github
+
+https://github.com/cs50/mario-demo/
