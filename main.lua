@@ -17,6 +17,10 @@ ball_x = {4450, 5700, 6000, 6300, 6720, 8100, 8500, 9900, 10600, 16000}
 ball_y = 500
 obst_img = {}
 
+collectibles = {}
+collectibles.got = 0
+collectibles.total = 0
+
 
 
 obstacles = {}
@@ -29,70 +33,91 @@ function obstacles.create(type_num, map_num, map_height)
 			type = type_num,
 			width = 80,
 			height = 25,
+			jump_height = 25,
 			x = 170 * map_num - 170 + 50,
 			y = 630 - 75 * (map_height - 1) - 25,			
 			deadly = true,
-			fireable = false
+			fireable = false,
+			shots = 0,
+			alpha = 1
 		}
 	elseif type_num == 2 then
 		this = {
 			type = type_num,
-			width = 85,
-			height = 39,
-			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 39,			
+			width = 170,
+			height = 78,
+			jump_height = 30,
+			x = 170 * map_num - 170,
+			y = 630 - 75 * (map_height - 1) - 78,			
 			deadly = false,
-			fireable = false
+			fireable = false,
+			shots = 0,
+			alpha = 1
 		}
 	elseif type_num == 3 then
 		this = {
 			type = type_num,
-			width = 45,
-			height = 44,
+			width = 77,
+			height = 75,
+			jump_height = 75,
 			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 44,			
+			y = 630 - 75 * (map_height - 1) - 75,			
 			deadly = false,
-			fireable = false
+			fireable = false,
+			shots = 0,
+			alpha = 1
 		}
 	elseif type_num == 4 then
 		this = {
 			type = type_num,
-			width = 27,
-			height = 35,
+			width = 58,
+			height = 75,
+			jump_height = 75,
 			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 35,			
+			y = 630 - 75 * (map_height - 1) - 75,			
 			deadly = false,
-			fireable = true
+			fireable = true,
+			shots = 3,
+			alpha = 1
 		}
 	elseif type_num == 5 then
 		this = {
 			type = type_num,
-			width = 30,
-			height = 32,
+			width = 66,
+			height = 70,
+			jump_height = 50,
 			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 32,			
+			y = 630 - 75 * (map_height - 1) - 70,			
 			deadly = false,
-			fireable = false
+			fireable = true,
+			shots = 1,
+			alpha = 1
 		}
 	elseif type_num == 6 then
 		this = {
 			type = type_num,
-			width = 25,
-			height = 34,
+			width = 55,
+			height = 75,
+			jump_height = 75,
 			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 34,			
+			y = 630 - 75 * (map_height - 1) - 75,			
 			deadly = false,
-			fireable = true
+			fireable = true,
+			shots = 2,
+			alpha = 1
 		}
 	elseif type_num == 7 then
 		this = {
 			type = type_num,
-			width = 31,
-			height = 27,
+			width = 57,
+			height = 50,
+			jump_height = 50,
 			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 27,			
+			y = 630 - 75 * (map_height - 1) - 50,			
 			deadly = false,
-			fireable = false
+			fireable = false,
+			shots = 0,
+			alpha = 1
 		}
 	end
 	-- setmetatable(this, obstacles)
@@ -123,6 +148,7 @@ function fill_map()
 		if map[i] == 2 or map[i] == 1 and i > 1 and i < 25 and math.random(3) > 1 then
 			obst_counter = obst_counter + 1
 			obstacles[obst_counter] = obstacles.create(math.random(7), i, map[i])
+			collectibles.total = collectibles.total + obstacles[obst_counter].shots
 		end
 	end
 end
@@ -132,12 +158,13 @@ function love.load()
 	ground = love.graphics.newImage("ground_and_rabbit/ground.png")
 	empty = love.graphics.newImage("ground_and_rabbit/empty.png")
 	obst_img[1] = love.graphics.newImage("obstacles/thorns_80_25.png")
-	obst_img[2] = love.graphics.newImage("obstacles/bench_85_39.png")
-	obst_img[3] = love.graphics.newImage("obstacles/box_45_44.png")
-	obst_img[4] = love.graphics.newImage("obstacles/keg_27_35.png")
-	obst_img[5] = love.graphics.newImage("obstacles/pumpkin_30_32.png")
-	obst_img[6] = love.graphics.newImage("obstacles/sack_25_34.png")
-	obst_img[7] = love.graphics.newImage("obstacles/stump_31_27.png")
+	obst_img[2] = love.graphics.newImage("obstacles/bench_170_78.png")
+	obst_img[3] = love.graphics.newImage("obstacles/box_77_75.png")
+	obst_img[4] = love.graphics.newImage("obstacles/keg_58_75.png")
+	obst_img[5] = love.graphics.newImage("obstacles/pumpkin_66_70.png")
+	obst_img[6] = love.graphics.newImage("obstacles/sack_55_75.png")
+	obst_img[7] = love.graphics.newImage("obstacles/stump_57_50.png")
+	-- carrot = love.graphics.newImage("carrot_50_19.png")
 	ball = love.graphics.newImage("obstacles/ball.png")
 	tree = love.graphics.newImage("back_front/tree.png")
 	wheat = love.graphics.newImage("back_front/wheat.png")
@@ -150,11 +177,22 @@ function love.load()
 	rabbitAnim[3] = love.graphics.newQuad(188, 0, 94, 60, rabbit:getDimensions())
 	rabbitAnim[4] = love.graphics.newQuad(282, 0, 94, 60, rabbit:getDimensions())
 	   
-	   love.graphics.setNewFont(22)
-	   -- love.graphics.setColor(0,0,0)
-	   -- love.graphics.setBackgroundColor(1, 0.85490196078431, 0.72549019607843)
-	   love.graphics.setDefaultFilter('nearest', 'nearest')
-	   fill_map()
+	love.graphics.setNewFont(22)
+	-- love.graphics.setColor(0,0,0)
+	-- love.graphics.setBackgroundColor(1, 0.85490196078431, 0.72549019607843)
+	love.graphics.setDefaultFilter('nearest', 'nearest')
+	fill_map()
+
+	carrot = {
+		img = love.graphics.newImage("carrot_50_19.png"),
+		width = 50,
+		height = 19,
+		x = rabbit_x - dx + 94,
+		y = math.floor(rabbit_y + 0.5) + 25,
+		state = 'off',
+		distance = 300,
+		direction = direction
+	}
 end
 
 
@@ -183,16 +221,23 @@ function love.draw()
 	x = 0
 	-- drawing obstacles
 	for i = 1, obst_counter do
+		love.graphics.setColor(1, 1, 1, obstacles[i].alpha)
 		love.graphics.draw(obst_img[obstacles[i].type], obstacles[i].x, obstacles[i].y)
 	end
-
+	love.graphics.setColor(1, 1, 1)
 	for i = 1, 10 do love.graphics.draw(ball, ball_x[i], ball_y) end
     love.graphics.translate(-dx, 0)
     love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
-    -- for i = 1, 3 do love.graphics.draw(ball, ball_x[i], ball_y) end
+    
+
+    if carrot.state == 'on' then love.graphics.draw(carrot.img, carrot.x + 25, carrot.y, 0, carrot.direction, 1, 25, 0) end
+
     love.graphics.setColor(0,0,0)
+    love.graphics.print(collectibles.got..'/'..collectibles.total, 500, 50)
     love.graphics.print(text, text_x, text_y)
     love.graphics.print(text1, text_x, text_y + 20)
+
+    
 end
 
 function love.mousereleased(x, y, button, istouch)
@@ -239,49 +284,103 @@ end
 function current_ground_y(current_rabbit_x)
 	local left_corner = math.floor(current_rabbit_x / 170 + 1)
 	local right_corner = math.floor((current_rabbit_x + 94) / 170 + 1)
-	text = left_corner
-	text1 = right_corner
-	if map[left_corner] == 2 or map[right_corner] == 2 then
-		return 495
-	elseif map[left_corner] == 0 and map[right_corner] == 0 then
+	-- text = left_corner
+	-- text1 = right_corner
+	local level1 = 720
+	if map[left_corner] == 0 and map[right_corner] == 0 then
 		return 660
+	elseif map[left_corner] == 2 or map[right_corner] == 2 then
+		level1 = 495
 	else
-		return 570
+		level1 = 570
 	end
+	local level2 = level1
+	for i = 1, obst_counter do
+			if (obstacles[i].x < current_rabbit_x + 94 and obstacles[i].x > current_rabbit_x)
+			 or (obstacles[i].x + obstacles[i].width < current_rabbit_x + 94 and obstacles[i].x + obstacles[i].width > current_rabbit_x) 
+			 or (obstacles[i].type == 2 and current_rabbit_x >= obstacles[i].x and current_rabbit_x + 94 <= obstacles[i].x + obstacles[i].width) then
+				level2 = obstacles[i].y + obstacles[i].height - obstacles[i].jump_height - 60
+				break
+			end
+	end
+	text = current_rabbit_x
+	-- text1 = level2
+	return math.min(level1, level2)
 end
 
 function is_obstacle(check_x)
 	local i = math.floor(check_x / 170 + 1)
 	if map[i] == 2 and math.floor(rabbit_y + 0.5) + 60 > 555 then return true
 	elseif map[i] == 1 and math.floor(rabbit_y + 0.5) + 60 > 630 then return true
-	else return false end
+	else
+		for i = 1, obst_counter do
+			if check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and math.floor(rabbit_y + 0.5) + 60 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then return true end
+		end
+	end
+	return false
 end
 
 
 function changer()
+	carrot_update()
 	for i = 1, 10 do 
 		ball_x[i] = ball_x[i] - 7
 		if ball_x[i] < -26 then ball_x[i] = 4250 end
 	end
 	if state == 'jump' or state == 'fall' then gravity = gravity + 25 end
 	if state == 'fall' then return end
-	if love.keyboard.isDown("left") and dx + 5 <= 0 and rabbit_x == 590 and is_obstacle(rabbit_x - (dx + 5)) == false then
+	if love.keyboard.isDown("left") and dx + 5 <= 0 and rabbit_x == 590 and is_obstacle(rabbit_x - (dx + 4)) == false then
 		dx = dx + 5
 		-- for i = 1, 3 do 
 		-- 	ball_x[i] = ball_x[i] + i * 2
 		-- 	if ball_x[i] < -26 then ball_x[i] = 1280 end
 		-- end
-	elseif love.keyboard.isDown("left") and rabbit_x - 5 >= 0 and is_obstacle(rabbit_x - dx - 5) == false then
+	elseif love.keyboard.isDown("left") and rabbit_x - 5 >= 0 and is_obstacle(rabbit_x - dx - 4) == false then
 		rabbit_x = rabbit_x - 5
-	elseif love.keyboard.isDown("right") and dx - 5 >= -2970 and rabbit_x == 590 and is_obstacle(rabbit_x + 94 - (dx - 5)) == false then
+	elseif love.keyboard.isDown("right") and dx - 5 >= -2970 and rabbit_x == 590 and is_obstacle(rabbit_x + 94 - (dx - 4)) == false then
 		dx = dx - 5
 		-- for i = 1, 3 do 
 		-- 	ball_x[i] = ball_x[i] - i * 2
 		-- 	if ball_x[i] < -26 then ball_x[i] = 1280 end
 		-- end
-	elseif love.keyboard.isDown("right") and rabbit_x + 5 <= 1186 and is_obstacle(rabbit_x + 94 - dx + 5) == false then
+	elseif love.keyboard.isDown("right") and rabbit_x + 5 <= 1186 and is_obstacle(rabbit_x + 94 - dx + 4) == false then
 		rabbit_x = rabbit_x + 5
 	end
+end
+
+function carrot_update()
+	if carrot.state == 'off' then
+		carrot.distance = 300
+		carrot.direction = direction
+	    carrot.y = math.floor(rabbit_y + 0.5) + 25
+	    if carrot.direction == -1 then carrot.x = rabbit_x - carrot.width
+	    else carrot.x = rabbit_x + 94 end
+	else
+		if carrot.direction == 1 then carrot.x = carrot.x + 7
+		else carrot.x = carrot.x - 7 end
+		carrot.distance = carrot.distance - 7
+		if carrot.distance < -7 or carrot_collision(carrot.x - dx + 50) == true then carrot.state = 'off' end
+	end
+end
+
+function carrot_collision(check_x)
+	if carrot.direction == -1 then check_x = check_x - 50 end
+	local i = math.floor(check_x / 170 + 1)
+	if map[i] == 2 and carrot.y + 19 > 555 then return true
+	elseif map[i] == 1 and carrot.y + 19 > 630 then return true
+	else
+		for i = 1, obst_counter do
+			if check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and carrot.y + 19 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then 
+				if obstacles[i].fireable == true and obstacles[i].shots > 0 then 
+					obstacles[i].shots = obstacles[i].shots - 1
+					collectibles.got = collectibles.got + 1
+					if obstacles[i].shots == 0 then obstacles[i].alpha = 0.8 end
+				end
+				return true 
+			end
+		end
+	end
+	return false
 end
 
 function love.keypressed(key)
@@ -290,5 +389,9 @@ function love.keypressed(key)
 	elseif key == 'space' and state == "walk" then
       state = 'jump'
       gravity = -600
+    elseif key == 'lalt' and carrot.state == 'off' then      
+    	carrot_update() 	
+    	carrot.state = 'on'
+    	text1 = carrot.x
 	end
 end
