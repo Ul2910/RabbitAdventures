@@ -16,14 +16,16 @@ gravity = -600
 ball_x = {4450, 5700, 6000, 6300, 6720, 8100, 8500, 9900, 10600, 16000}
 ball_y = 500
 obst_img = {}
+veggies_img = {}
 
 collectibles = {}
 collectibles.got = 0
 collectibles.total = 0
 
-
+-- map width = 25 or 170 px * 25 = 4250 px
 
 obstacles = {}
+
 -- obstacles.__index = obstacles
 
 function obstacles.create(type_num, map_num, map_height)
@@ -78,7 +80,8 @@ function obstacles.create(type_num, map_num, map_height)
 			deadly = false,
 			fireable = true,
 			shots = 3,
-			alpha = 1
+			alpha = 1,
+			veggies = {}
 		}
 	elseif type_num == 5 then
 		this = {
@@ -91,7 +94,8 @@ function obstacles.create(type_num, map_num, map_height)
 			deadly = false,
 			fireable = true,
 			shots = 1,
-			alpha = 1
+			alpha = 1,
+			veggies = {}
 		}
 	elseif type_num == 6 then
 		this = {
@@ -104,7 +108,8 @@ function obstacles.create(type_num, map_num, map_height)
 			deadly = false,
 			fireable = true,
 			shots = 2,
-			alpha = 1
+			alpha = 1,
+			veggies = {}
 		}
 	elseif type_num == 7 then
 		this = {
@@ -124,7 +129,58 @@ function obstacles.create(type_num, map_num, map_height)
 	return this
 end
 
--- map width = 25 or 170 px * 25 = 4250 px
+function veggies_create(type_num, x, y)
+	-- local this = {}
+	if type_num == 1 then
+		this = {
+			type = type_num,
+			width = 26,
+			height = 24,
+			x = x - 13,
+			y = y - 24,			
+			state = 'off'
+		}
+	elseif type_num == 2 then
+		this = {
+			type = type_num,
+			width = 36,
+			height = 36,
+			x = x - 18,
+			y = y - 36,			
+			state = 'off'
+		}
+	elseif type_num == 3 then
+		this = {
+			type = type_num,
+			width = 39,
+			height = 36,
+			x = x - 19,
+			y = y - 36,			
+			state = 'off'
+		}
+	elseif type_num == 4 then
+		this = {
+			type = type_num,
+			width = 23,
+			height = 27,
+			x = x - 11,
+			y = y - 27,			
+			state = 'off'
+		}
+	elseif type_num == 5 then
+		this = {
+			type = type_num,
+			width = 23,
+			height = 22,
+			x = x - 11,
+			y = y - 22,			
+			state = 'off'
+		}
+	end
+	-- setmetatable(this, obstacles)
+	return this
+end
+
 function fill_map()
 	math.randomseed(os.time())
 	map = {}
@@ -149,6 +205,10 @@ function fill_map()
 			obst_counter = obst_counter + 1
 			obstacles[obst_counter] = obstacles.create(math.random(7), i, map[i])
 			collectibles.total = collectibles.total + obstacles[obst_counter].shots
+			for i = 1, obstacles[obst_counter].shots do 
+				local middle = obstacles[obst_counter].x + math.floor(obstacles[obst_counter].width / 2)
+				obstacles[obst_counter].veggies[i] = veggies_create(math.random(5), middle, obstacles[obst_counter].y) 
+			end
 		end
 	end
 end
@@ -164,7 +224,13 @@ function love.load()
 	obst_img[5] = love.graphics.newImage("obstacles/pumpkin_66_70.png")
 	obst_img[6] = love.graphics.newImage("obstacles/sack_55_75.png")
 	obst_img[7] = love.graphics.newImage("obstacles/stump_57_50.png")
-	-- carrot = love.graphics.newImage("carrot_50_19.png")
+	
+	veggies_img[1] = love.graphics.newImage("veggies/broccoli_26_24.png")
+	veggies_img[2] = love.graphics.newImage("veggies/cabbage_36_36.png")
+	veggies_img[3] = love.graphics.newImage("veggies/marrow_39_36.png")
+	veggies_img[4] = love.graphics.newImage("veggies/pepper_23_27.png")
+	veggies_img[5] = love.graphics.newImage("veggies/tomato_23_22.png")
+
 	ball = love.graphics.newImage("obstacles/ball.png")
 	tree = love.graphics.newImage("back_front/tree.png")
 	wheat = love.graphics.newImage("back_front/wheat.png")
@@ -187,7 +253,7 @@ function love.load()
 		img = love.graphics.newImage("carrot_50_19.png"),
 		width = 50,
 		height = 19,
-		x = rabbit_x - dx + 94,
+		x = rabbit_x - dx + 44,
 		y = math.floor(rabbit_y + 0.5) + 25,
 		state = 'off',
 		distance = 300,
@@ -223,14 +289,21 @@ function love.draw()
 	for i = 1, obst_counter do
 		love.graphics.setColor(1, 1, 1, obstacles[i].alpha)
 		love.graphics.draw(obst_img[obstacles[i].type], obstacles[i].x, obstacles[i].y)
+		if obstacles[i].fireable == true and #obstacles[i].veggies > 0 then
+			love.graphics.setColor(1, 1, 1)
+			for j = 1, #obstacles[i].veggies do
+				if obstacles[i].veggies[j].status == 'on' then love.graphics.draw(veggies_img[obstacles[i].veggies[j].type], obstacles[i].veggies[j].x, obstacles[i].veggies[j].y) end
+			end
+		end
 	end
 	love.graphics.setColor(1, 1, 1)
 	for i = 1, 10 do love.graphics.draw(ball, ball_x[i], ball_y) end
     love.graphics.translate(-dx, 0)
+    if carrot.state == 'on' then love.graphics.draw(carrot.img, carrot.x + 25, carrot.y, 0, carrot.direction, 1, 25, 0) end
     love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
     
 
-    if carrot.state == 'on' then love.graphics.draw(carrot.img, carrot.x + 25, carrot.y, 0, carrot.direction, 1, 25, 0) end
+    
 
     love.graphics.setColor(0,0,0)
     love.graphics.print(collectibles.got..'/'..collectibles.total, 500, 50)
@@ -295,12 +368,13 @@ function current_ground_y(current_rabbit_x)
 		level1 = 570
 	end
 	local level2 = level1
+	local highest_obst
 	for i = 1, obst_counter do
 			if (obstacles[i].x < current_rabbit_x + 94 and obstacles[i].x > current_rabbit_x)
 			 or (obstacles[i].x + obstacles[i].width < current_rabbit_x + 94 and obstacles[i].x + obstacles[i].width > current_rabbit_x) 
 			 or (obstacles[i].type == 2 and current_rabbit_x >= obstacles[i].x and current_rabbit_x + 94 <= obstacles[i].x + obstacles[i].width) then
-				level2 = obstacles[i].y + obstacles[i].height - obstacles[i].jump_height - 60
-				break
+				highest_obst = obstacles[i].y + obstacles[i].height - obstacles[i].jump_height - 60
+				if level2 > highest_obst then level2 = highest_obst end
 			end
 	end
 	text = current_rabbit_x
@@ -323,6 +397,7 @@ end
 
 function changer()
 	carrot_update()
+	veggies_update()
 	for i = 1, 10 do 
 		ball_x[i] = ball_x[i] - 7
 		if ball_x[i] < -26 then ball_x[i] = 4250 end
@@ -353,13 +428,29 @@ function carrot_update()
 		carrot.distance = 300
 		carrot.direction = direction
 	    carrot.y = math.floor(rabbit_y + 0.5) + 25
-	    if carrot.direction == -1 then carrot.x = rabbit_x - carrot.width
-	    else carrot.x = rabbit_x + 94 end
+	    if carrot.direction == -1 then carrot.x = rabbit_x
+	    else carrot.x = rabbit_x + 44 end
 	else
 		if carrot.direction == 1 then carrot.x = carrot.x + 7
 		else carrot.x = carrot.x - 7 end
 		carrot.distance = carrot.distance - 7
 		if carrot.distance < -7 or carrot_collision(carrot.x - dx + 50) == true then carrot.state = 'off' end
+	end
+end
+
+function veggies_update()
+	for i = 1, obst_counter do
+		if obstacles[i].fireable == true then
+			local j = 1
+			while j <= #obstacles[i].veggies and obstacles[i].veggies[j].status == 'on' do
+				obstacles[i].veggies[j].y = obstacles[i].veggies[j].y - 3 
+				if obstacles[i].y - obstacles[i].veggies[j].y > 250 then
+					table.remove(obstacles[i].veggies, j)
+					j = j - 1
+				end
+				j = j + 1
+			end
+		end
 	end
 end
 
@@ -372,6 +463,9 @@ function carrot_collision(check_x)
 		for i = 1, obst_counter do
 			if check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and carrot.y + 19 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then 
 				if obstacles[i].fireable == true and obstacles[i].shots > 0 then 
+					local j = 1
+					while j <= #obstacles[i].veggies and obstacles[i].veggies[j].status == 'on' do j = j + 1 end
+					obstacles[i].veggies[j].status = 'on'
 					obstacles[i].shots = obstacles[i].shots - 1
 					collectibles.got = collectibles.got + 1
 					if obstacles[i].shots == 0 then obstacles[i].alpha = 0.8 end
