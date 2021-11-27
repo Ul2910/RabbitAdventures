@@ -23,6 +23,7 @@ collectibles.got = 0
 collectibles.total = 0
 
 -- map width = 25 or 170 px * 25 = 4250 px
+-- with platform 6800 px
 
 obstacles = {}
 
@@ -259,6 +260,13 @@ function love.load()
 		distance = 300,
 		direction = direction
 	}
+	platform = {
+		width = 300,
+		height = 15,
+		x = 4300,
+		y = 550,
+		direction = 1
+	}
 end
 
 
@@ -284,6 +292,19 @@ function love.draw()
 	    end	   
 	    x = x + 170 
 	end
+
+	-- drawing platform area
+	for i = 1, 10 do 
+		love.graphics.draw(empty, x, y) 
+		x = x + 170 
+	end
+	for i = 1, 5 do 
+		love.graphics.draw(ground, x, y)
+		love.graphics.draw(ground, x, y - 75)
+		x = x + 170 
+	end
+
+
 	x = 0
 	-- drawing obstacles
 	for i = 1, obst_counter do
@@ -298,6 +319,12 @@ function love.draw()
 	end
 	love.graphics.setColor(1, 1, 1)
 	for i = 1, 10 do love.graphics.draw(ball, ball_x[i], ball_y) end
+
+	-- platform drawing
+	love.graphics.setColor(0.5, 0.3, 0.1)
+	love.graphics.rectangle('fill', platform.x, platform.y, platform.width, platform.height, 10, 10, 5)
+
+    love.graphics.setColor(1, 1, 1)
     love.graphics.translate(-dx, 0)
     if carrot.state == 'on' then love.graphics.draw(carrot.img, carrot.x + 25, carrot.y, 0, carrot.direction, 1, 25, 0) end
     love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
@@ -398,9 +425,10 @@ end
 function changer()
 	carrot_update()
 	veggies_update()
+	platform_update()
 	for i = 1, 10 do 
 		ball_x[i] = ball_x[i] - 7
-		if ball_x[i] < -26 then ball_x[i] = 4250 end
+		if ball_x[i] < -26 then ball_x[i] = 6800 end
 	end
 	if state == 'jump' or state == 'fall' then gravity = gravity + 25 end
 	if state == 'fall' then return end
@@ -412,7 +440,7 @@ function changer()
 		-- end
 	elseif love.keyboard.isDown("left") and rabbit_x - 5 >= 0 and is_obstacle(rabbit_x - dx - 4) == false then
 		rabbit_x = rabbit_x - 5
-	elseif love.keyboard.isDown("right") and dx - 5 >= -2970 and rabbit_x == 590 and is_obstacle(rabbit_x + 94 - (dx - 4)) == false then
+	elseif love.keyboard.isDown("right") and dx - 5 >= -5520 and rabbit_x == 590 and is_obstacle(rabbit_x + 94 - (dx - 4)) == false then
 		dx = dx - 5
 		-- for i = 1, 3 do 
 		-- 	ball_x[i] = ball_x[i] - i * 2
@@ -421,6 +449,17 @@ function changer()
 	elseif love.keyboard.isDown("right") and rabbit_x + 5 <= 1186 and is_obstacle(rabbit_x + 94 - dx + 4) == false then
 		rabbit_x = rabbit_x + 5
 	end
+end
+
+function platform_update()
+	if platform.direction == 1 and platform.x + platform.width <= 5900 then
+		platform.x = platform.x + 5
+	elseif platform.direction == -1 and platform.x >= 4300 then
+		platform.x = platform.x - 5
+	else
+		platform.direction = platform.direction * -1
+	end
+
 end
 
 function carrot_update()
