@@ -189,7 +189,7 @@ function fill_map()
 	obst_counter = 0
 	for i = 1, 25 do
 		local rand = math.random(5)
-		if i > 1 and rand == 1 and map[i-1] ~= 0 then
+		if i > 1 and i < 25 and rand == 1 and map[i-1] ~= 0 then
 			map[i] = 0
 			back[i] = 0
 		elseif i > 1 and rand == 2 then
@@ -388,12 +388,12 @@ function current_ground_y(current_rabbit_x)
 	local right_corner = math.floor((current_rabbit_x + 94) / 170 + 1)
 	-- text = left_corner
 	-- text1 = right_corner
-	local level1 = 720
-	if map[left_corner] == 0 and map[right_corner] == 0 then
+	local level1 = 660
+	if map[left_corner] == 0 and map[right_corner] == 0 and right_corner < 25 then
 		return 660
 	elseif map[left_corner] == 2 or map[right_corner] == 2 then
 		level1 = 495
-	else
+	elseif map[left_corner] == 1 or map[right_corner] == 1 then
 		level1 = 570
 	end
 	local level2 = level1
@@ -406,8 +406,10 @@ function current_ground_y(current_rabbit_x)
 				if level2 > highest_obst then level2 = highest_obst end
 			end
 	end
+	-- Check if above platform
+	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and platform.y - 60 < level2 then level2 = platform.y - 60 end
 	text = current_rabbit_x
-	-- text1 = level2
+	text1 = platform.x
 	return math.min(level1, level2)
 end
 
@@ -419,6 +421,8 @@ function is_obstacle(check_x)
 		for i = 1, obst_counter do
 			if check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and math.floor(rabbit_y + 0.5) + 60 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then return true end
 		end
+		-- Check platform collision
+		if check_x >= platform.x and check_x <= platform.x + platform.width and math.floor(rabbit_y + 0.5) > platform.y + platform.height and math.floor(rabbit_y + 0.5) + 60 < platform.y then return true end
 	end
 	return false
 end
@@ -427,7 +431,7 @@ end
 function changer()
 	carrot_update()
 	veggies_update()
-	platform_update()
+	local platform_distance = platform_update()
 	for i = 1, 10 do 
 		ball_x[i] = ball_x[i] - 7
 		if ball_x[i] < -26 then ball_x[i] = 6800 end
@@ -435,7 +439,7 @@ function changer()
 	if state == 'jump' or state == 'fall' then gravity = gravity + 25 end
 	if state == 'fall' then return end
 	if love.keyboard.isDown("left") and dx + 5 <= 0 and rabbit_x == 590 and is_obstacle(rabbit_x - (dx + 4)) == false then
-		dx = dx + 5
+		dx = dx + 5 - platform_distance * platform.direction
 		-- for i = 1, 3 do 
 		-- 	ball_x[i] = ball_x[i] + i * 2
 		-- 	if ball_x[i] < -26 then ball_x[i] = 1280 end
@@ -443,25 +447,37 @@ function changer()
 	elseif love.keyboard.isDown("left") and rabbit_x - 5 >= 0 and is_obstacle(rabbit_x - dx - 4) == false then
 		rabbit_x = rabbit_x - 5
 	elseif love.keyboard.isDown("right") and dx - 5 >= -5520 and rabbit_x == 590 and is_obstacle(rabbit_x + 94 - (dx - 4)) == false then
-		dx = dx - 5
+		dx = dx - 5 - platform_distance * platform.direction
 		-- for i = 1, 3 do 
 		-- 	ball_x[i] = ball_x[i] - i * 2
 		-- 	if ball_x[i] < -26 then ball_x[i] = 1280 end
 		-- end
 	elseif love.keyboard.isDown("right") and rabbit_x + 5 <= 1186 and is_obstacle(rabbit_x + 94 - dx + 4) == false then
 		rabbit_x = rabbit_x + 5
+	else dx = dx - platform_distance * platform.direction
 	end
 end
 
 function platform_update()
+	local platform_delta = 0
 	if platform.direction == 1 and platform.x + platform.width <= 5900 then
-		platform.x = platform.x + 5
+		platform_delta = 5
 	elseif platform.direction == -1 and platform.x >= 4300 then
-		platform.x = platform.x - 5
+		platform_delta = 5
 	else
 		platform.direction = platform.direction * -1
 	end
+	platform.x = platform.x + platform_delta * platform.direction
+	if rabbit_on_platform(rabbit_x - dx) == false then 
+		return 0 
+	else
+		return platform_delta
+	end
+end
 
+function rabbit_on_platform(current_rabbit_x)
+	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and math.floor(rabbit_y + 0.5) + 60 == 550 then text1 = 'on platform' return true
+	else return false end
 end
 
 function carrot_update()
