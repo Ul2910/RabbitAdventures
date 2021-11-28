@@ -23,7 +23,7 @@ collectibles.got = 0
 collectibles.total = 0
 
 -- map width = 25 or 170 px * 25 = 4250 px
--- with platform 6800 px
+-- with platform 40 or 170 px * 40 = 6800 px
 
 obstacles = {}
 
@@ -189,7 +189,7 @@ function fill_map()
 	obst_counter = 0
 	for i = 1, 25 do
 		local rand = math.random(5)
-		if i > 1 and i < 25 and rand == 1 and map[i-1] ~= 0 then
+		if i > 1 and rand == 1 and map[i-1] ~= 0 then
 			map[i] = 0
 			back[i] = 0
 		elseif i > 1 and rand == 2 then
@@ -202,7 +202,7 @@ function fill_map()
 			elseif rand == 3 then back[i] = 'wheat'
 			elseif rand == 4 then back[i] = 'clothes' end
 		end
-		if map[i] == 2 or map[i] == 1 and i > 1 and i < 25 and math.random(3) > 1 then
+		if map[i] == 2 or map[i] == 1 and i > 1 and math.random(3) > 1 then
 			obst_counter = obst_counter + 1
 			obstacles[obst_counter] = obstacles.create(math.random(7), i, map[i])
 			collectibles.total = collectibles.total + obstacles[obst_counter].shots
@@ -212,6 +212,8 @@ function fill_map()
 			end
 		end
 	end
+	for i = 26, 35 do map[i] = 0 end
+	for i = 36, 40 do map[i] = 2 end
 end
 
 function love.load()
@@ -277,7 +279,7 @@ function love.draw()
 	changer()
 	love.graphics.translate(dx, dy)
     
-    for i = 1, 25 do
+    for i = 1, 40 do
 	    if map[i] == 1 then
 	    	love.graphics.draw(ground, x, y)
 	    	if back[i] == 'tree' then love.graphics.draw(tree, x - 65, y - 300)
@@ -294,15 +296,15 @@ function love.draw()
 	end
 
 	-- drawing platform area
-	for i = 1, 10 do 
-		love.graphics.draw(empty, x, y) 
-		x = x + 170 
-	end
-	for i = 1, 5 do 
-		love.graphics.draw(ground, x, y)
-		love.graphics.draw(ground, x, y - 75)
-		x = x + 170 
-	end
+	-- for i = 1, 10 do 
+	-- 	love.graphics.draw(empty, x, y) 
+	-- 	x = x + 170 
+	-- end
+	-- for i = 1, 5 do 
+	-- 	love.graphics.draw(ground, x, y)
+	-- 	love.graphics.draw(ground, x, y - 75)
+	-- 	x = x + 170 
+	-- end
 
 
 	x = 0
@@ -522,7 +524,7 @@ function love.keypressed(key)
 	elseif key == 'space' and state == "walk" then
       state = 'jump'
       gravity = -600
-    elseif key == 'lalt' and carrot.state == 'off' then      
+    elseif key == 'b' and carrot.state == 'off' then      
     	carrot_update() 	
     	carrot.state = 'on'
     	text1 = carrot.x
