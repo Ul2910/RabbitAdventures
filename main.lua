@@ -1,5 +1,6 @@
 text = "Hello"
 text1 = "Hello"
+text2 = "Hello"
 text_x = 100
 text_y = 300
 x = 0
@@ -336,8 +337,9 @@ function love.draw()
 
     love.graphics.setColor(0,0,0)
     love.graphics.print(collectibles.got..'/'..collectibles.total, 500, 50)
-    love.graphics.print(text, text_x, text_y)
-    love.graphics.print(text1, text_x, text_y + 20)
+    love.graphics.print(text, text_x + 600, text_y)
+    love.graphics.print(text1, text_x + 600, text_y + 20)
+    love.graphics.print(text2, text_x + 600, text_y + 40)
 
     
 end
@@ -356,7 +358,8 @@ function love.update(dt)
 	if state == 'jump' or state == 'fall' then
 		rabbit_current_frame = 2
 		rabbit_y = rabbit_y + gravity * dt
-		local curr_ground_y = current_ground_y(rabbit_x - dx)
+		if state == 'jump' then
+			curr_ground_y = current_ground_y(rabbit_x - dx) end
 		if gravity >= 0 and rabbit_y >= curr_ground_y then
 			state = 'walk'
 			-- gravity = -600
@@ -370,7 +373,8 @@ function love.update(dt)
 			timer = timer + 6 * dt
 			if timer > 4 then timer = 1 end
 			rabbit_current_frame = math.floor(timer + 0.5)
-			if current_ground_y(rabbit_x - dx) > rabbit_y then 
+			curr_ground_y = current_ground_y(rabbit_x - dx)
+			if curr_ground_y > rabbit_y then 
 				gravity = 0
 				state = 'fall'
 			end
@@ -390,6 +394,7 @@ function current_ground_y(current_rabbit_x)
 	-- text1 = right_corner
 	local level1 = 660
 	if map[left_corner] == 0 and map[right_corner] == 0 and right_corner < 25 then
+		text2 = 660
 		return 660
 	elseif map[left_corner] == 2 or map[right_corner] == 2 then
 		level1 = 495
@@ -408,8 +413,7 @@ function current_ground_y(current_rabbit_x)
 	end
 	-- Check if above platform
 	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and platform.y - 60 < level2 then level2 = platform.y - 60 end
-	text = current_rabbit_x
-	text1 = platform.x
+	text2 = math.min(level1, level2)
 	return math.min(level1, level2)
 end
 
@@ -422,7 +426,7 @@ function is_obstacle(check_x)
 			if check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and math.floor(rabbit_y + 0.5) + 60 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then return true end
 		end
 		-- Check platform collision
-		if check_x >= platform.x and check_x <= platform.x + platform.width and math.floor(rabbit_y + 0.5) > platform.y + platform.height and math.floor(rabbit_y + 0.5) + 60 < platform.y then return true end
+		if check_x >= platform.x and check_x <= platform.x + platform.width and math.floor(rabbit_y + 0.5) < platform.y + platform.height and math.floor(rabbit_y + 0.5) + 60 > platform.y then return true end
 	end
 	return false
 end
@@ -436,6 +440,9 @@ function changer()
 		ball_x[i] = ball_x[i] - 7
 		if ball_x[i] < -26 then ball_x[i] = 6800 end
 	end
+	text = state
+	text1 = rabbit_x - dx
+	
 	if state == 'jump' or state == 'fall' then gravity = gravity + 25 end
 	if state == 'fall' then return end
 	if love.keyboard.isDown("left") and dx + 5 <= 0 and rabbit_x == 590 and is_obstacle(rabbit_x - (dx + 4)) == false then
@@ -446,7 +453,7 @@ function changer()
 		-- end
 	elseif love.keyboard.isDown("left") and rabbit_x - 5 >= 0 and is_obstacle(rabbit_x - dx - 4) == false then
 		rabbit_x = rabbit_x - 5
-	elseif love.keyboard.isDown("right") and dx - 5 >= -5520 and rabbit_x == 590 and is_obstacle(rabbit_x + 94 - (dx - 4)) == false then
+	elseif love.keyboard.isDown("right") and dx - 5 >= -5520 and rabbit_x == 590 and is_obstacle(rabbit_x + 94 - (dx - 4 - platform_distance * platform.direction)) == false then
 		dx = dx - 5 - platform_distance * platform.direction
 		-- for i = 1, 3 do 
 		-- 	ball_x[i] = ball_x[i] - i * 2
@@ -456,6 +463,7 @@ function changer()
 		rabbit_x = rabbit_x + 5
 	else dx = dx - platform_distance * platform.direction
 	end
+
 end
 
 function platform_update()
@@ -476,7 +484,8 @@ function platform_update()
 end
 
 function rabbit_on_platform(current_rabbit_x)
-	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and math.floor(rabbit_y + 0.5) + 60 == 550 then text1 = 'on platform' return true
+	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and math.floor(rabbit_y + 0.5) + 60 == 550 then return true
+	-- elseif current_rabbit_x >= platform.x + platform.width and love.keyboard.isDown("right") then text1 = 'off' state = 'fall' return false
 	else return false end
 end
 
@@ -543,6 +552,5 @@ function love.keypressed(key)
     elseif key == 'b' and carrot.state == 'off' then      
     	carrot_update() 	
     	carrot.state = 'on'
-    	text1 = carrot.x
 	end
 end
