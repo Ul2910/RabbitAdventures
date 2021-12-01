@@ -310,6 +310,12 @@ function love.load()
 	rabbitAnim[2] = love.graphics.newQuad(94, 0, 94, 60, rabbit:getDimensions())
 	rabbitAnim[3] = love.graphics.newQuad(188, 0, 94, 60, rabbit:getDimensions())
 	rabbitAnim[4] = love.graphics.newQuad(282, 0, 94, 60, rabbit:getDimensions())
+
+	chestAnim = {}
+	chestAnim[1] = love.graphics.newImage("chest/chest1_80_68.png")
+	chestAnim[2] = love.graphics.newImage("chest/chest2_80_78.png")
+	chestAnim[3] = love.graphics.newImage("chest/chest3_80_82.png")
+	chestAnim[4] = love.graphics.newImage("chest/chest4_80_87.png")
 	   
 	love.graphics.setNewFont(22)
 	-- love.graphics.setColor(0,0,0)
@@ -333,6 +339,13 @@ function love.load()
 		x = 4350,
 		y = 550,
 		direction = 1
+	}
+	chest = {
+		width = 80,
+		height = {68, 78, 82, 87},
+		x = 6650,
+		y = 487,
+		frame = 1
 	}
 end
 
@@ -374,8 +387,12 @@ function love.draw()
 			end
 		end
 	end
+
 	love.graphics.setColor(1, 1, 1)
 	for i = 1, 10 do love.graphics.draw(ball, ball_x[i], ball_y) end
+
+	-- drawing chest
+	love.graphics.draw(chestAnim[chest.frame], chest.x, chest.y)
 
 	-- platform drawing
 	love.graphics.setColor(0.5, 0.3, 0.1)
