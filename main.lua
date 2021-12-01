@@ -3,6 +3,8 @@ text1 = "Hello"
 text2 = "Hello"
 text_x = 100
 text_y = 300
+thorns_timer = 0
+thorns_direction = 1
 x = 0
 y = 630
 dx = 0
@@ -39,8 +41,7 @@ function obstacles.create(type_num, map_num, map_height)
 			height = 25,
 			jump_height = 25,
 			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 25,			
-			deadly = true,
+			y = 630 - 75 * (map_height - 1) - 20,		
 			fireable = false,
 			shots = 0,
 			alpha = 1
@@ -53,7 +54,6 @@ function obstacles.create(type_num, map_num, map_height)
 			jump_height = 30,
 			x = 170 * map_num - 170,
 			y = 630 - 75 * (map_height - 1) - 78,			
-			deadly = false,
 			fireable = false,
 			shots = 0,
 			alpha = 1
@@ -66,7 +66,6 @@ function obstacles.create(type_num, map_num, map_height)
 			jump_height = 75,
 			x = 170 * map_num - 170 + 50,
 			y = 630 - 75 * (map_height - 1) - 75,			
-			deadly = false,
 			fireable = false,
 			shots = 0,
 			alpha = 1
@@ -79,7 +78,6 @@ function obstacles.create(type_num, map_num, map_height)
 			jump_height = 75,
 			x = 170 * map_num - 170 + 50,
 			y = 630 - 75 * (map_height - 1) - 75,			
-			deadly = false,
 			fireable = true,
 			shots = 3,
 			alpha = 1,
@@ -93,7 +91,6 @@ function obstacles.create(type_num, map_num, map_height)
 			jump_height = 50,
 			x = 170 * map_num - 170 + 50,
 			y = 630 - 75 * (map_height - 1) - 70,			
-			deadly = false,
 			fireable = true,
 			shots = 1,
 			alpha = 1,
@@ -107,7 +104,6 @@ function obstacles.create(type_num, map_num, map_height)
 			jump_height = 75,
 			x = 170 * map_num - 170 + 50,
 			y = 630 - 75 * (map_height - 1) - 75,			
-			deadly = false,
 			fireable = true,
 			shots = 2,
 			alpha = 1,
@@ -121,7 +117,6 @@ function obstacles.create(type_num, map_num, map_height)
 			jump_height = 50,
 			x = 170 * map_num - 170 + 50,
 			y = 630 - 75 * (map_height - 1) - 50,			
-			deadly = false,
 			fireable = false,
 			shots = 0,
 			alpha = 1
@@ -193,7 +188,7 @@ function fill_map()
 		if i > 1 and i < 25 and rand == 1 and map[i-1] ~= 0 then
 			map[i] = 0
 			back[i] = 0
-		elseif i > 1 and rand == 2 then
+		elseif i == 25 or (i > 1 and rand == 2) then
 		 	map[i] = 2
 		else
 			map[i] = 1
@@ -206,6 +201,7 @@ function fill_map()
 		if map[i] == 2 or map[i] == 1 and i > 1 and math.random(3) > 1 then
 			obst_counter = obst_counter + 1
 			obstacles[obst_counter] = obstacles.create(math.random(7), i, map[i])
+			if obstacles[obst_counter].type == 1 and obst_counter % 2 == 0 then obstacles[obst_counter].y = obstacles[obst_counter].y + 26 end
 			collectibles.total = collectibles.total + obstacles[obst_counter].shots
 			for i = 1, obstacles[obst_counter].shots do 
 				local middle = obstacles[obst_counter].x + math.floor(obstacles[obst_counter].width / 2)
@@ -266,7 +262,7 @@ function love.load()
 	platform = {
 		width = 300,
 		height = 15,
-		x = 4300,
+		x = 4350,
 		y = 550,
 		direction = 1
 	}
@@ -296,23 +292,11 @@ function love.draw()
 	    x = x + 170 
 	end
 
-	-- drawing platform area
-	-- for i = 1, 10 do 
-	-- 	love.graphics.draw(empty, x, y) 
-	-- 	x = x + 170 
-	-- end
-	-- for i = 1, 5 do 
-	-- 	love.graphics.draw(ground, x, y)
-	-- 	love.graphics.draw(ground, x, y - 75)
-	-- 	x = x + 170 
-	-- end
-
-
 	x = 0
 	-- drawing obstacles
 	for i = 1, obst_counter do
 		love.graphics.setColor(1, 1, 1, obstacles[i].alpha)
-		love.graphics.draw(obst_img[obstacles[i].type], obstacles[i].x, obstacles[i].y)
+		love.graphics.draw(obst_img[obstacles[i].type], obstacles[i].x, math.floor(obstacles[i].y + 0.5))
 		if obstacles[i].fireable == true and #obstacles[i].veggies > 0 then
 			love.graphics.setColor(1, 1, 1)
 			for j = 1, #obstacles[i].veggies do
@@ -333,15 +317,11 @@ function love.draw()
     love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
     
 
-    
-
     love.graphics.setColor(0,0,0)
     love.graphics.print(collectibles.got..'/'..collectibles.total, 500, 50)
     love.graphics.print(text, text_x + 600, text_y)
     love.graphics.print(text1, text_x + 600, text_y + 20)
-    love.graphics.print(text2, text_x + 600, text_y + 40)
-
-    
+    love.graphics.print(text2, text_x + 600, text_y + 40)    
 end
 
 function love.mousereleased(x, y, button, istouch)
@@ -352,7 +332,21 @@ function love.mousereleased(x, y, button, istouch)
    end
 end
 
+function thorns_animation(dt)
+	thorns_timer = thorns_timer + 20 * dt
+	if thorns_timer < 0 then return end
+	for i = 1, obst_counter do
+		if obstacles[i].type == 1 and i % 2 == 0 then 
+			obstacles[i].y = obstacles[i].y - thorns_direction * 20 * dt
+		elseif obstacles[i].type == 1 and i % 2 == 1 then 
+			obstacles[i].y = obstacles[i].y + thorns_direction * 20 * dt
+		end
+	end
+	if thorns_timer > 26 then thorns_timer = -35 thorns_direction = thorns_direction * -1 end
+end
+
 function love.update(dt)
+	thorns_animation(dt)
 	-- text_x = text_x + 10 * dt -- this would increment num by 10 per second
 	-- text_y = text_y - 10 * dt
 	if state == 'jump' or state == 'fall' then
@@ -413,8 +407,8 @@ function current_ground_y(current_rabbit_x)
 	end
 	-- Check if above platform
 	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and platform.y - 60 < level2 then level2 = platform.y - 60 end
-	text2 = math.min(level1, level2)
-	return math.min(level1, level2)
+	text2 = math.floor(math.min(level1, level2) + 0.5)
+	return math.floor(math.min(level1, level2) + 0.5)
 end
 
 function is_obstacle(check_x)
@@ -444,7 +438,7 @@ function changer()
 	text1 = rabbit_x - dx
 	
 	if state == 'jump' or state == 'fall' then gravity = gravity + 25 end
-	if state == 'fall' then return end
+	if state == 'fall' then dx = dx + platform_push_rabbit() return end
 	if love.keyboard.isDown("left") and dx + 5 <= 0 and rabbit_x == 590 and is_obstacle(rabbit_x - (dx + 4)) == false then
 		dx = dx + 5 - platform_distance * platform.direction
 		-- for i = 1, 3 do 
@@ -463,14 +457,33 @@ function changer()
 		rabbit_x = rabbit_x + 5
 	else dx = dx - platform_distance * platform.direction
 	end
+end
 
+function platform_push_rabbit()
+	if platform.direction == 1 
+	and state == 'fall'
+	and platform.x + platform.width >= rabbit_x - dx 
+	and platform.x + platform.width < rabbit_x - dx + 94 
+	and math.floor(rabbit_y + 0.5) + 60 >= platform.y
+	and math.floor(rabbit_y + 0.5) <= platform.y + platform.height then
+		return -5
+	elseif platform.direction == -1 
+	and state == 'fall'
+	and platform.x > rabbit_x - dx 
+	and platform.x <= rabbit_x - dx + 94 
+	and math.floor(rabbit_y + 0.5) + 60 >= platform.y
+	and math.floor(rabbit_y + 0.5) <= platform.y + platform.height then
+		return 5
+	else
+		return 0
+	end
 end
 
 function platform_update()
 	local platform_delta = 0
-	if platform.direction == 1 and platform.x + platform.width <= 5900 then
+	if platform.direction == 1 and platform.x + platform.width <= 5850 then
 		platform_delta = 5
-	elseif platform.direction == -1 and platform.x >= 4300 then
+	elseif platform.direction == -1 and platform.x >= 4350 then
 		platform_delta = 5
 	else
 		platform.direction = platform.direction * -1
