@@ -20,6 +20,8 @@ ball_x = {4450, 5700, 6000, 6300, 6720, 8100, 8500, 9900, 10600, 16000}
 ball_y = 500
 obst_img = {}
 veggies_img = {}
+backgr_img = {}
+back_imgs = {'tree', 'sunflowers', 'wheat', 'clothes', 'scarecrow', 'streelamp'}
 
 collectibles = {}
 collectibles.got = 0
@@ -29,11 +31,12 @@ collectibles.total = 0
 -- with platform 40 or 170 px * 40 = 6800 px
 
 obstacles = {}
+backgrounds = {}
 
 -- obstacles.__index = obstacles
 
 function obstacles.create(type_num, map_num, map_height)
-	-- local this = {}
+	local this = {}
 	if type_num == 1 then
 		this = {
 			type = type_num,
@@ -127,7 +130,7 @@ function obstacles.create(type_num, map_num, map_height)
 end
 
 function veggies_create(type_num, x, y)
-	-- local this = {}
+	local this = {}
 	if type_num == 1 then
 		this = {
 			type = type_num,
@@ -178,11 +181,75 @@ function veggies_create(type_num, x, y)
 	return this
 end
 
+function backgrounds.create(type_num, map_num, map_height)
+	local this = {}
+	if type_num == 1 then
+		this = {
+			type = type_num,
+			width = 300,
+			height = 300,
+			x = 170 * map_num - 170 - 65,
+			y = 630 - 75 * (map_height - 1) - 300	
+		}
+	elseif type_num == 2 then
+		this = {
+			type = type_num,
+			width = 170,
+			height = 90,
+			x = 170 * map_num - 170,
+			y = 630 - 75 * (map_height - 1) - 90		
+		}
+	elseif type_num == 3 then
+		this = {
+			type = type_num,
+			width = 170,
+			height = 130,
+			x = 170 * map_num - 170,
+			y = 630 - 75 * (map_height - 1) - 130	
+		}
+	elseif type_num == 4 then
+		this = {
+			type = type_num,
+			width = 170,
+			height = 90,
+			x = 170 * map_num - 170,
+			y = 630 - 75 * (map_height - 1) - 90	
+		}
+	elseif type_num == 5 then
+		this = {
+			type = type_num,
+			width = 109,
+			height = 150,
+			x = 170 * map_num - 100,
+			y = 630 - 75 * (map_height - 1) - 150	
+		}
+	elseif type_num == 6 then
+		this = {
+			type = type_num,
+			width = 90,
+			height = 205,
+			x = 170 * map_num - 170,
+			y = 630 - 75 * (map_height - 1) - 205	
+		}
+	elseif type_num == 7 then
+		this = {
+			type = type_num,
+			width = 170,
+			height = 64,
+			x = 170 * map_num - 170,
+			y = 630 - 75 * (map_height - 1) - 64	
+		}
+	end
+	-- setmetatable(this, obstacles)
+	return this
+end
+
 function fill_map()
 	math.randomseed(os.time())
 	map = {}
 	back = {}
 	obst_counter = 0
+	back_counter = 0
 	for i = 1, 25 do
 		local rand = math.random(5)
 		if i > 1 and i < 25 and rand == 1 and map[i-1] ~= 0 then
@@ -192,11 +259,8 @@ function fill_map()
 		 	map[i] = 2
 		else
 			map[i] = 1
-			rand = math.random(4)
-			if rand == 1 then back[i] = 'tree'
-			elseif rand == 2 then back[i] = 'sunflowers'
-			elseif rand == 3 then back[i] = 'wheat'
-			elseif rand == 4 then back[i] = 'clothes' end
+			back_counter = back_counter + 1
+			backgrounds[back_counter] = backgrounds.create(math.random(7), i, map[i])
 		end
 		if map[i] == 2 or map[i] == 1 and i > 1 and math.random(3) > 1 then
 			obst_counter = obst_counter + 1
@@ -231,11 +295,15 @@ function love.load()
 	veggies_img[4] = love.graphics.newImage("veggies/pepper_23_27.png")
 	veggies_img[5] = love.graphics.newImage("veggies/tomato_23_22.png")
 
+	backgr_img[1] = love.graphics.newImage("back_front/tree_300_300.png")
+	backgr_img[2] = love.graphics.newImage("back_front/wheat_170_90.png")
+	backgr_img[3] = love.graphics.newImage("back_front/clothes_170_130.png")
+	backgr_img[4] = love.graphics.newImage("back_front/sunflowers_170_90.png")
+	backgr_img[5] = love.graphics.newImage("back_front/scarecrow_109_150.png")
+	backgr_img[6] = love.graphics.newImage("back_front/streetlamp_90_205.png")
+	backgr_img[7] = love.graphics.newImage("back_front/bush_170_64.png")
+
 	ball = love.graphics.newImage("obstacles/ball.png")
-	tree = love.graphics.newImage("back_front/tree.png")
-	wheat = love.graphics.newImage("back_front/wheat.png")
-	clothes = love.graphics.newImage("back_front/clothes.png")
-	sunflowers = love.graphics.newImage("back_front/sunflowers.png")
 	rabbit = love.graphics.newImage("ground_and_rabbit/rabbit_anim_376_60.png")
 	rabbitAnim = {}
 	rabbitAnim[1] = love.graphics.newQuad(0, 0, 94, 60, rabbit:getDimensions())
@@ -279,10 +347,6 @@ function love.draw()
     for i = 1, 40 do
 	    if map[i] == 1 then
 	    	love.graphics.draw(ground, x, y)
-	    	if back[i] == 'tree' then love.graphics.draw(tree, x - 65, y - 300)
-	    	elseif back[i] == 'sunflowers' then love.graphics.draw(sunflowers, x, y - 90)
-	    	elseif back[i] == 'wheat' then love.graphics.draw(wheat, x, y - 90)
-	    	elseif back[i] == 'clothes' then love.graphics.draw(clothes, x, y - 130) end
 	    elseif map[i] == 0 then
 	    	love.graphics.draw(empty, x, y)	 
 	    else   
@@ -293,6 +357,12 @@ function love.draw()
 	end
 
 	x = 0
+
+	-- drawing back images
+	for i = 1, back_counter do
+		love.graphics.draw(backgr_img[backgrounds[i].type], backgrounds[i].x, backgrounds[i].y)
+	end
+
 	-- drawing obstacles
 	for i = 1, obst_counter do
 		love.graphics.setColor(1, 1, 1, obstacles[i].alpha)
