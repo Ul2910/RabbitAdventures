@@ -17,8 +17,8 @@ rabbit_y = 570
 rabbit_x = 0
 state = 'walk'
 gravity = -600
-ball_x = {4450, 5700, 6000, 6300, 6720, 8100, 8500, 9900, 10600, 16000}
-ball_y = 500
+-- ball_x = {4450, 5700, 6000, 6300, 6720, 8100, 8500, 9900, 10600, 16000}
+-- ball_y = 500
 obst_img = {}
 veggies_img = {}
 backgr_img = {}
@@ -311,7 +311,7 @@ function love.load()
 	backgr_img[6] = love.graphics.newImage("back_front/streetlamp_90_205.png")
 	backgr_img[7] = love.graphics.newImage("back_front/bush_170_64.png")
 
-	ball = love.graphics.newImage("obstacles/ball.png")
+	-- ball = love.graphics.newImage("obstacles/ball_27_27.png")
 	rabbit = love.graphics.newImage("ground_and_rabbit/rabbit_anim_376_60.png")
 	rabbitAnim = {}
 	rabbitAnim[1] = love.graphics.newQuad(0, 0, 94, 60, rabbit:getDimensions())
@@ -330,7 +330,13 @@ function love.load()
 	-- love.graphics.setBackgroundColor(1, 0.85490196078431, 0.72549019607843)
 	love.graphics.setDefaultFilter('nearest', 'nearest')
 	
-
+	ball = {
+		img = love.graphics.newImage("obstacles/ball_27_27.png"),
+		x = {4450, 5700, 6000, 6300, 6720, 8100, 8500, 9900, 10600, 16000},
+		y = 500,
+		status = {'off', 'off', 'off', 'off', 'off', 'off', 'off', 'off', 'off', 'off'},
+		timer = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+	}
 	carrot = {
 		img = love.graphics.newImage("carrot_50_19.png"),
 		width = 50,
@@ -351,9 +357,9 @@ function love.load()
 	chest = {
 		width = 80,
 		height = 68,
-		jump_height = 68,
+		jump_height = 1000,
 		x = 6700,
-		y = 487,
+		y = 555 - 68,
 		fireable = true,
 		shots = 10,
 		frame = 1,
@@ -395,7 +401,7 @@ function love.draw()
 		if i < obst_counter then
 			love.graphics.draw(obst_img[obstacles[i].type], obstacles[i].x, math.floor(obstacles[i].y + 0.5))
 		else
-			love.graphics.draw(chestAnim[obstacles[i].frame], obstacles[i].x, obstacles[i].y)
+			love.graphics.draw(chestAnim[chest.frame], chest.x, chest.y)
 		end
 		if obstacles[i].fireable == true and i < obst_counter and #obstacles[i].veggies > 0 then
 			love.graphics.setColor(1, 1, 1)
@@ -405,8 +411,11 @@ function love.draw()
 		end
 	end
 
+	-- Drawing balls
 	love.graphics.setColor(1, 1, 1)
-	for i = 1, 10 do love.graphics.draw(ball, ball_x[i], ball_y) end
+	for i = 1, 10 do 
+		if ball.status[i] == 'on' then love.graphics.draw(ball.img, ball.x[i], ball.y) end
+	end
 
 	-- drawing chest hp
 	love.graphics.setColor(0.8, 0, 0)
@@ -454,8 +463,34 @@ function thorns_animation(dt)
 	if thorns_timer > 26 then thorns_timer = -35 thorns_direction = thorns_direction * -1 end
 end
 
+function chest_and_balls_animation(dt)
+	for i = 1, 10 do 
+		if ball.status[i] == 'on' then
+			ball.x[i] = math.floor(ball.x[i] - 350 * dt + 0.5)
+			if ball.x[i] < -26 then 
+				ball.status[i] = 'off' 
+				ball.x[i] = 6726 
+			end
+			if ball.timer[i] < 1 then 
+				ball.timer[i] = ball.timer[i] - 1 * dt
+				if ball.timer[i] < 0 then 
+					ball.timer[i] = 1 
+					chest.frame = 1
+					chest.y = 555 - chest.frame_height[1]
+				end
+			end
+		elseif ball.status[i] == 'off' then
+			chest.frame = 2
+			chest.y = 555 - chest.frame_height[2]
+			ball.timer[i] = ball.timer[i] - 1 * dt
+			if ball.timer[i] < 0.5 then ball.status[i] = 'on' end
+		end
+	end
+end
+
 function love.update(dt)
 	totalTime = totalTime + 1 * dt
+	chest_and_balls_animation(dt)
 	thorns_animation(dt)
 	-- text_x = text_x + 10 * dt -- this would increment num by 10 per second
 	-- text_y = text_y - 10 * dt
@@ -540,10 +575,10 @@ function changer()
 	carrot_update()
 	veggies_update()
 	local platform_distance = platform_update()
-	for i = 1, 10 do 
-		ball_x[i] = ball_x[i] - 7
-		if ball_x[i] < -26 then ball_x[i] = 6800 end
-	end
+	-- for i = 1, 10 do 
+	-- 	ball.x[i] = ball.x[i] - 7
+	-- 	if ball.x[i] < -26 then ball.x[i] = 6726 end
+	-- end
 	text = state
 	text1 = rabbit_x - dx
 	
