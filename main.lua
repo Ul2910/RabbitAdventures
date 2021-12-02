@@ -3,6 +3,7 @@ text1 = "Hello"
 text2 = "Hello"
 text_x = 100
 text_y = 300
+totalTime = 0
 thorns_timer = 0
 thorns_direction = 1
 x = 0
@@ -250,6 +251,7 @@ function fill_map()
 	back = {}
 	obst_counter = 0
 	back_counter = 0
+	local middle = 0
 	for i = 1, 25 do
 		local rand = math.random(5)
 		if i > 1 and i < 25 and rand == 1 and map[i-1] ~= 0 then
@@ -268,11 +270,17 @@ function fill_map()
 			if obstacles[obst_counter].type == 1 and obst_counter % 2 == 0 then obstacles[obst_counter].y = obstacles[obst_counter].y + 26 end
 			collectibles.total = collectibles.total + obstacles[obst_counter].shots
 			for i = 1, obstacles[obst_counter].shots do 
-				local middle = obstacles[obst_counter].x + math.floor(obstacles[obst_counter].width / 2)
+				middle = obstacles[obst_counter].x + math.floor(obstacles[obst_counter].width / 2)
 				obstacles[obst_counter].veggies[i] = veggies_create(math.random(5), middle, obstacles[obst_counter].y) 
 			end
 		end
 	end
+
+	-- adding chest
+	obst_counter = obst_counter + 1
+	obstacles[obst_counter] = chest
+	middle = obstacles[obst_counter].x + math.floor(obstacles[obst_counter].width / 2)
+
 	for i = 26, 35 do map[i] = 0 end
 	for i = 36, 40 do map[i] = 2 end
 end
@@ -321,7 +329,7 @@ function love.load()
 	-- love.graphics.setColor(0,0,0)
 	-- love.graphics.setBackgroundColor(1, 0.85490196078431, 0.72549019607843)
 	love.graphics.setDefaultFilter('nearest', 'nearest')
-	fill_map()
+	
 
 	carrot = {
 		img = love.graphics.newImage("carrot_50_19.png"),
@@ -342,11 +350,16 @@ function love.load()
 	}
 	chest = {
 		width = 80,
-		height = {68, 78, 82, 87},
-		x = 6650,
+		height = 68,
+		jump_height = 68,
+		x = 6700,
 		y = 487,
-		frame = 1
+		fireable = true,
+		shots = 10,
+		frame = 1,
+		frame_height = {68, 78, 82, 87}
 	}
+	fill_map()
 end
 
 
@@ -379,8 +392,12 @@ function love.draw()
 	-- drawing obstacles
 	for i = 1, obst_counter do
 		love.graphics.setColor(1, 1, 1, obstacles[i].alpha)
-		love.graphics.draw(obst_img[obstacles[i].type], obstacles[i].x, math.floor(obstacles[i].y + 0.5))
-		if obstacles[i].fireable == true and #obstacles[i].veggies > 0 then
+		if i < obst_counter then
+			love.graphics.draw(obst_img[obstacles[i].type], obstacles[i].x, math.floor(obstacles[i].y + 0.5))
+		else
+			love.graphics.draw(chestAnim[obstacles[i].frame], obstacles[i].x, obstacles[i].y)
+		end
+		if obstacles[i].fireable == true and i < obst_counter and #obstacles[i].veggies > 0 then
 			love.graphics.setColor(1, 1, 1)
 			for j = 1, #obstacles[i].veggies do
 				if obstacles[i].veggies[j].status == 'on' then love.graphics.draw(veggies_img[obstacles[i].veggies[j].type], obstacles[i].veggies[j].x, obstacles[i].veggies[j].y) end
@@ -391,8 +408,10 @@ function love.draw()
 	love.graphics.setColor(1, 1, 1)
 	for i = 1, 10 do love.graphics.draw(ball, ball_x[i], ball_y) end
 
-	-- drawing chest
-	love.graphics.draw(chestAnim[chest.frame], chest.x, chest.y)
+	-- drawing chest hp
+	love.graphics.setColor(0.8, 0, 0)
+	love.graphics.rectangle('fill', chest.x, chest.y - 20, 8 * chest.shots, 8)
+	love.graphics.rectangle('line', chest.x + 8 * chest.shots, chest.y - 19, 80 - 8 * chest.shots, 6)
 
 	-- platform drawing
 	love.graphics.setColor(0.5, 0.3, 0.1)
@@ -403,9 +422,12 @@ function love.draw()
     if carrot.state == 'on' then love.graphics.draw(carrot.img, carrot.x + 25, carrot.y, 0, carrot.direction, 1, 25, 0) end
     love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
     
-
+    -- Printing info
+    love.graphics.setColor(1,1,0)
+    love.graphics.print('Veggies: '..math.floor(collectibles.got * 100 / collectibles.total + 0.5)..'%', 5, 5)
+    -- love.graphics.print('Veggies: '..collectibles.got..'/'..collectibles.total, 5, 5)
+    love.graphics.print('Time: '..math.floor(totalTime), 1140, 5)
     love.graphics.setColor(0,0,0)
-    love.graphics.print(collectibles.got..'/'..collectibles.total, 500, 50)
     love.graphics.print(text, text_x + 600, text_y)
     love.graphics.print(text1, text_x + 600, text_y + 20)
     love.graphics.print(text2, text_x + 600, text_y + 40)    
@@ -433,6 +455,7 @@ function thorns_animation(dt)
 end
 
 function love.update(dt)
+	totalTime = totalTime + 1 * dt
 	thorns_animation(dt)
 	-- text_x = text_x + 10 * dt -- this would increment num by 10 per second
 	-- text_y = text_y - 10 * dt
@@ -605,7 +628,7 @@ function carrot_update()
 end
 
 function veggies_update()
-	for i = 1, obst_counter do
+	for i = 1, obst_counter - 1 do
 		if obstacles[i].fireable == true then
 			local j = 1
 			while j <= #obstacles[i].veggies and obstacles[i].veggies[j].status == 'on' do
@@ -628,13 +651,15 @@ function carrot_collision(check_x)
 	else
 		for i = 1, obst_counter do
 			if check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and carrot.y + 19 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then 
-				if obstacles[i].fireable == true and obstacles[i].shots > 0 then 
+				if obstacles[i].fireable == true and obstacles[i].shots > 0 and i < obst_counter then 
 					local j = 1
 					while j <= #obstacles[i].veggies and obstacles[i].veggies[j].status == 'on' do j = j + 1 end
 					obstacles[i].veggies[j].status = 'on'
 					obstacles[i].shots = obstacles[i].shots - 1
 					collectibles.got = collectibles.got + 1
 					if obstacles[i].shots == 0 then obstacles[i].alpha = 0.8 end
+				elseif i == obst_counter and obstacles[i].shots > 0 then 
+					obstacles[i].shots = obstacles[i].shots - 1
 				end
 				return true 
 			end
