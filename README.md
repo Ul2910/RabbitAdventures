@@ -1,2 +1,2 @@
 # Bunny_Adventures
-Platformer created with Lua with Love
+Platformer game in Lua with LÖVE
