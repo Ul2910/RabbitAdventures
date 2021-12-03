@@ -15,7 +15,7 @@ timer = 1
 direction = 1
 rabbit_y = 570
 rabbit_x = 0
-state = 'walk'
+state = 'start'
 gravity = -600
 -- ball_x = {4450, 5700, 6000, 6300, 6720, 8100, 8500, 9900, 10600, 16000}
 -- ball_y = 500
@@ -289,19 +289,24 @@ function fill_map()
 	obst_counter = 0
 	back_counter = 0
 	local middle = 0
-	for i = 1, 25 do
+	for i = 1, 40 do
 		local rand = math.random(5)
-		if i > 1 and i < 25 and rand == 1 and map[i-1] ~= 0 then
+		if (i > 1 and i < 25 and rand == 1 and map[i-1] ~= 0) or (i > 25 and i < 36) then
 			map[i] = 0
 			back[i] = 0
-		elseif i == 25 or (i > 1 and rand == 2) then
+		elseif i == 25 or (i > 1 and rand == 2) or i > 35 then
 		 	map[i] = 2
 		else
 			map[i] = 1
+			-- back_counter = back_counter + 1
+			-- backgrounds[back_counter] = backgrounds.create(math.random(7), i, map[i])
+		end
+		-- if map[i] == 1 or (map[i] == 2 and i > 35 and i < 40) then 
+		if map[i] == 1 or map[i] == 2 and math.random(3) > 1 then 
 			back_counter = back_counter + 1
 			backgrounds[back_counter] = backgrounds.create(math.random(7), i, map[i])
 		end
-		if map[i] == 2 or map[i] == 1 and i > 1 and math.random(3) > 1 then
+		if (map[i] == 2 or map[i] == 1) and i > 1 and i < 25 and math.random(4) > 2 then
 			obst_counter = obst_counter + 1
 			obstacles[obst_counter] = obstacles.create(math.random(7), i, map[i])
 			if obstacles[obst_counter].type == 1 and obst_counter % 2 == 0 then obstacles[obst_counter].y = obstacles[obst_counter].y + 26 end
@@ -323,8 +328,8 @@ function fill_map()
 		if i > 1 then chest.veggies[i].y = chest.veggies[i - 1].y + 40 end
 	end
 
-	for i = 26, 35 do map[i] = 0 end
-	for i = 36, 40 do map[i] = 2 end
+	-- for i = 26, 35 do map[i] = 0 end
+	-- for i = 36, 40 do map[i] = 2 end
 end
 
 function love.load()
@@ -372,6 +377,7 @@ function love.load()
 	font26 = love.graphics.newFont(26)
 	font20 = love.graphics.newFont(20)
 	font14 = love.graphics.newFont(14)
+	font36 = love.graphics.newFont(36)
 	love.graphics.setFont(font24)
 	-- love.graphics.setColor(0,0,0)
 	-- love.graphics.setBackgroundColor(1, 0.85490196078431, 0.72549019607843)
@@ -417,65 +423,40 @@ function love.load()
 	fill_map()
 end
 
-function draw_win()
+function draw_start()	
+	love.graphics.draw(ground, 1110, 630)	
+	love.graphics.draw(ground, 940, 630)
+	love.graphics.draw(rabbit, rabbitAnim[1], 593, 100)
+	love.graphics.draw(backgr_img[5], 15, 570)
+	love.graphics.draw(backgr_img[4], 0, 630)	
+	love.graphics.draw(obst_img[5], 150, 650)
+	love.graphics.draw(backgr_img[7], 385, 656)
+	love.graphics.draw(obst_img[2], 555, 642)
+	love.graphics.draw(backgr_img[7], 725, 656)
+	love.graphics.draw(backgr_img[1], 980, 330)
+	love.graphics.draw(chestAnim[1], 1165, 562)
+	love.graphics.setColor(1,1,0)
+	love.graphics.setFont(font36)
+	love.graphics.print('RABBIT ADVENTURES', 445, 200)
+	love.graphics.setFont(font26)
+	love.graphics.print('Survive and collect all veggies!', 445, 240)
+	love.graphics.print('Arrows - move', 445, 300)
+	love.graphics.print('Space - jump', 445, 330)
+	love.graphics.print('B - throw carrots', 445, 360)
+	love.graphics.print('Press \'space\' to start', 445, 415)
+	love.graphics.setFont(font24)
 	love.graphics.setColor(1, 1, 1)
-	love.graphics.draw(background, 0, 0)
-	love.graphics.translate(dx, dy)
-    
-    for i = 1, 40 do
-	    if map[i] == 1 then
-	    	love.graphics.draw(ground, x, y)
-	    elseif map[i] == 0 then
-	    	love.graphics.draw(empty, x, y)	 
-	    else   
-	    	love.graphics.draw(ground, x, y)
-	    	love.graphics.draw(ground, x, y - 75) 	
-	    end	   
-	    x = x + 170 
-	end
-
-	x = 0
-
-	-- drawing back images
-	for i = 1, back_counter do
-		love.graphics.draw(backgr_img[backgrounds[i].type], backgrounds[i].x, backgrounds[i].y)
-	end
-
-	-- drawing obstacles
-	for i = 1, obst_counter do
-		love.graphics.setColor(1, 1, 1, obstacles[i].alpha)
-		if i < obst_counter then
-			love.graphics.draw(obst_img[obstacles[i].type], obstacles[i].x, math.floor(obstacles[i].y + 0.5))
-		else
-			love.graphics.draw(chestAnim[chest.frame], chest.x, 555 - chest.frame_height[chest.frame])
-		end
-	end
-
-	-- platform drawing
-	love.graphics.setColor(0.5, 0.3, 0.1)
-	love.graphics.rectangle('fill', platform.x, platform.y, platform.width, platform.height, 10, 10, 5)
-
-    love.graphics.setColor(1, 1, 1)
-
-    win_animation()
-
-    love.graphics.translate(-dx, 0)
-    print_final_info()
-    love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
-    
-    -- Printing info
-    love.graphics.setColor(1,1,0)
-    love.graphics.print('Veggies: '..math.floor(collectibles.got * 100 / collectibles.total + 0.5)..'%', 5, 5)
-    -- love.graphics.print('Veggies: '..collectibles.got..'/'..collectibles.total, 5, 5)
-    love.graphics.print('Time: '..math.floor(totalTime), 1140, 5)  
 end
 
 function love.draw()
-	-- love.graphics.setFont(font24)
-	if state == 'win' or state == 'wait' then draw_win() return end
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.draw(background, 0, 0)
-	changer()
+	if state == 'start' then draw_start() return end
+	-- love.graphics.setFont(font24)
+	-- if state == 'win' or state == 'wait' or state == 'lose' then draw_win_lose() return end
+	
+	love.graphics.draw(background, 0, 0)
+	if state == 'walk' or state == 'jump' or state == 'fall' then changer() end
 	love.graphics.translate(dx, dy)
     
     for i = 1, 40 do
@@ -505,7 +486,8 @@ function love.draw()
 		else
 			love.graphics.draw(chestAnim[chest.frame], chest.x, 555 - chest.frame_height[chest.frame])
 		end
-		if obstacles[i].fireable == true and i < obst_counter and #obstacles[i].veggies > 0 then
+		if state ~= 'win' and state ~= 'wait' and state ~= 'lose' 
+		and obstacles[i].fireable == true and i < obst_counter and #obstacles[i].veggies > 0 then
 			love.graphics.setColor(1, 1, 1)
 			for j = 1, #obstacles[i].veggies do
 				if obstacles[i].veggies[j].status == 'on' then love.graphics.draw(veggies_img[obstacles[i].veggies[j].type], obstacles[i].veggies[j].x, obstacles[i].veggies[j].y) end
@@ -530,11 +512,11 @@ function love.draw()
 
     love.graphics.setColor(1, 1, 1)
 
-    -- if state == 'win' or state == 'wait' then win_animation() end  
+    if state == 'win' or state == 'wait' then win_animation() end  
 
     love.graphics.translate(-dx, 0)
-    -- if state == 'wait' then print_final_info() end 
-    if carrot.state == 'on' then love.graphics.draw(carrot.img, carrot.x + 25, carrot.y, 0, carrot.direction, 1, 25, 0) end
+    if state == 'wait' or state == 'lose' then print_final_info()
+    elseif carrot.state == 'on' then love.graphics.draw(carrot.img, carrot.x + 25, carrot.y, 0, carrot.direction, 1, 25, 0) end
     love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
     
     -- Printing info
@@ -542,27 +524,29 @@ function love.draw()
     love.graphics.print('Veggies: '..math.floor(collectibles.got * 100 / collectibles.total + 0.5)..'%', 5, 5)
     -- love.graphics.print('Veggies: '..collectibles.got..'/'..collectibles.total, 5, 5)
     love.graphics.print('Time: '..math.floor(totalTime), 1140, 5)
-    love.graphics.setColor(0,0,0)
-    love.graphics.print(text, text_x + 600, text_y)
-    love.graphics.print(text1, text_x + 600, text_y + 20)
-    love.graphics.print(text2, text_x + 600, text_y + 40)    
+    -- love.graphics.setColor(0,0,0)
+    -- love.graphics.print(text, text_x + 600, text_y)
+    -- love.graphics.print(text1, text_x + 600, text_y + 20)
+    -- love.graphics.print(text2, text_x + 600, text_y + 40)    
 end
 
 function print_final_info()
     love.graphics.setColor(1,1,0)
 	love.graphics.setFont(font26)
-	love.graphics.print('WIN!', 600, 160)
-	love.graphics.print('Time: '..math.floor(totalTime), 480, 200)
-	love.graphics.print('Press \'space\' to play again', 480, 240) 
-	love.graphics.setFont(font20)
-	love.graphics.print('Developed by Uliana (github: ul2910)', 880, 670)
-	love.graphics.setColor(0.5,0.3,0.1)
-	love.graphics.print('Art:', 20, 565)
-	love.graphics.setFont(font14)
-	love.graphics.print('background - Photo by Ferdinand Stöhr on unsplash.com', 20, 600)
-	love.graphics.print('village assets - by Cainos on itch.io', 20, 620)
-	love.graphics.print('bunny sprite - by felinoid on opengameart.org', 20, 640)
-	love.graphics.print('vegetables - by ScratchIO on opengameart.org', 20, 660)
+	love.graphics.print('Press \'space\' to play again', 480, 220)
+	if state == 'lose' then love.graphics.print('GAME OVER!', 560, 160)
+	else 
+		love.graphics.print('WIN!', 600, 160) 
+		love.graphics.setFont(font20)
+		love.graphics.print('Developed by Uliana (github: ul2910)', 880, 670)
+		love.graphics.setColor(0.5,0.3,0.1)
+		love.graphics.print('Art:', 20, 565)
+		love.graphics.setFont(font14)
+		love.graphics.print('background - Photo by Ferdinand Stöhr on unsplash.com', 20, 600)
+		love.graphics.print('village assets - by Cainos on itch.io', 20, 620)
+		love.graphics.print('bunny sprite - by felinoid on opengameart.org', 20, 640)
+		love.graphics.print('vegetables - by ScratchIO on opengameart.org', 20, 660)
+	end
 	love.graphics.setFont(font24)
 	love.graphics.setColor(1, 1, 1)
 end
@@ -627,7 +611,7 @@ function chest_and_balls_animation(dt)
 end
 
 function love.update(dt)
-	if state == 'win' or state == 'wait' then 
+	if state == 'win' or state == 'wait' or state == 'lose' or state == 'start' then 
 		if state == 'win' and chest.timer > 0 then chest.timer = chest.timer - 1 * dt end
 		return 
 	end
@@ -853,10 +837,12 @@ end
 function love.keypressed(key)
 	if key == 'escape' then
 		love.event.quit()
-	elseif state == 'win' or (state == 'wait' and key ~= 'space') then 
+	elseif state == 'win' or ((state == 'wait' or state == 'lose') and key ~= 'space') then 
 		return
-	elseif state == 'wait' and key == 'space' then 
+	elseif (state == 'wait' or state == 'lose') and key == 'space' then 
 		love.event.quit("restart")
+	elseif state == 'start' and key == 'space' then 
+		state = 'walk'
 	elseif key == 'space' and state == "walk" then
       state = 'jump'
       gravity = -600
