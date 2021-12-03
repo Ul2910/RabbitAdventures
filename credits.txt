@@ -19,3 +19,16 @@ https://www.tug.org/pracjourn/2007-4/walden/color.pdf
 Coltonoscopy mario github
 
 https://github.com/cs50/mario-demo/
+
+https://cainos.itch.io/pixel-art-platformer-village-props
+
+
+
+Art:
+background - Photo by Ferdinand Stohr on unsplash.com
+village assets - by Cainos on itch.io
+bunny sprite - by felinoid on opengameart.org
+vegetables - by ScratchIO on opengameart.org
+
+Developed by Uliana (github: ul2910)
+2021
