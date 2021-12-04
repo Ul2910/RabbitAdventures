@@ -333,6 +333,17 @@ function fill_map()
 end
 
 function love.load()
+	music = love.audio.newSource("sounds/416778__mativve__happy-sandbox.wav", 'static')
+	wait_music = love.audio.newSource("sounds/455109__slaking-97__free-music-background-loop-001.wav", 'static')
+	win_sound = love.audio.newSource("sounds/580310__colorscrimsontears__fanfare-2-rpg.wav", 'static')
+	lose_sound = love.audio.newSource("sounds/253174__suntemple__retro-you-lose-sfx.wav", 'static')
+	chest_dmg_sound = love.audio.newSource("sounds/458867__raclure__damage-sound-effect.mp3", 'static')
+	jump_sound = love.audio.newSource("sounds/350905__cabled-mess__jump-c-05.wav", 'static')
+	carrot_sound = love.audio.newSource("sounds/171697__nenadsimic__menu-selection-click.wav", 'static')
+    music:setLooping(true)
+    wait_music:setLooping(true)
+    wait_music:play()
+    
    	background = love.graphics.newImage("ground_and_rabbit/background.png")
 	ground = love.graphics.newImage("ground_and_rabbit/ground.png")
 	empty = love.graphics.newImage("ground_and_rabbit/empty.png")
@@ -555,7 +566,7 @@ function win_animation()
 	if chest.frame < 4 then
 		if chest.timer < 1 and chest.timer > 0.5 then chest.frame = 2
 		elseif chest.timer < 0.5 and chest.timer > 0 then chest.frame = 3
-		elseif chest.timer < 0 then chest.frame = 4 state = 'wait' end
+		elseif chest.timer < 0 then chest.frame = 4 state = 'wait' wait_music:play() end
 	else
 		text1 = chest.veggies[1].y
 		for i = 1, 13 do
@@ -813,6 +824,7 @@ function carrot_collision(check_x)
 		for i = 1, obst_counter do
 			if check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and carrot.y + 19 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then 
 				if obstacles[i].fireable == true and obstacles[i].shots > 0 and i < obst_counter then 
+					carrot_sound:play()
 					local j = 1
 					while j <= #obstacles[i].veggies and obstacles[i].veggies[j].status == 'on' do j = j + 1 end
 					obstacles[i].veggies[j].status = 'on'
@@ -821,8 +833,11 @@ function carrot_collision(check_x)
 					if obstacles[i].shots == 0 then obstacles[i].alpha = 0.8 end
 				elseif i == obst_counter and obstacles[i].shots > 0 then 
 					obstacles[i].shots = obstacles[i].shots - 1
+					chest_dmg_sound:play()
 					if obstacles[i].shots == 0 then 
 						state = 'win' 
+						music:stop()
+						win_sound:play()
 						chest.frame = 1 
 						for i = 1, 10 do ball.status[i] = 'off' end
 					end
@@ -843,8 +858,11 @@ function love.keypressed(key)
 		love.event.quit("restart")
 	elseif state == 'start' and key == 'space' then 
 		state = 'walk'
+		wait_music:stop()
+		music:play()
 	elseif key == 'space' and state == "walk" then
       state = 'jump'
+      jump_sound:play()
       gravity = -600
     elseif key == 'b' and carrot.state == 'off' then      
     	carrot_update() 	
