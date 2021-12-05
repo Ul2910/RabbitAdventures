@@ -65,11 +65,11 @@ function obstacles.create(type_num, map_num, map_height)
 	elseif type_num == 3 then
 		this = {
 			type = type_num,
-			width = 77,
-			height = 75,
-			jump_height = 75,
+			width = 72,
+			height = 70,
+			jump_height = 70,
 			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 75,			
+			y = 630 - 75 * (map_height - 1) - 70,			
 			fireable = false,
 			shots = 0,
 			alpha = 1
@@ -282,6 +282,17 @@ function backgrounds.create(type_num, map_num, map_height)
 	return this
 end
 
+function check_obst_reachable(i, obst_counter)
+	if obst_counter == 0 then return true end
+	if map[i-1] == 1 
+	and (i == 2 or map[i-2] == 2)
+	and obstacles[obst_counter].fireable == true 
+	and obstacles[obst_counter].x >= 170 * (i - 2) then 
+		return false
+	else
+		return true end
+end
+
 function fill_map()
 	math.randomseed(os.time())
 	map = {}
@@ -294,7 +305,7 @@ function fill_map()
 		if (i > 1 and i < 25 and rand == 1 and map[i-1] ~= 0) or (i > 25 and i < 36) then
 			map[i] = 0
 			back[i] = 0
-		elseif i == 25 or (i > 1 and rand == 2) or i > 35 then
+		elseif (i == 25 or (i > 1 and rand == 2) or i > 35) and check_obst_reachable(i, obst_counter) == true then
 		 	map[i] = 2
 		else
 			map[i] = 1
@@ -349,7 +360,7 @@ function love.load()
 	empty = love.graphics.newImage("ground_and_rabbit/empty.png")
 	obst_img[1] = love.graphics.newImage("obstacles/thorns_80_25.png")
 	obst_img[2] = love.graphics.newImage("obstacles/bench_170_78.png")
-	obst_img[3] = love.graphics.newImage("obstacles/box_77_75.png")
+	obst_img[3] = love.graphics.newImage("obstacles/box_72_70.png")
 	obst_img[4] = love.graphics.newImage("obstacles/keg_58_75.png")
 	obst_img[5] = love.graphics.newImage("obstacles/pumpkin_66_70.png")
 	obst_img[6] = love.graphics.newImage("obstacles/sack_55_75.png")
@@ -552,7 +563,15 @@ function print_final_info()
 		love.graphics.print('Developed by Uliana (github: ul2910)', 880, 670)
 		love.graphics.setColor(0.5,0.3,0.1)
 		love.graphics.print('Art:', 20, 565)
+		love.graphics.print('Music and sounds - from freesound.org:', 20, 305)
 		love.graphics.setFont(font14)
+		love.graphics.print('menu music - by Slaking_97', 20, 340)
+		love.graphics.print('main theme - by Mativve', 20, 360)
+		love.graphics.print('jump - by cabled_mess', 20, 380)
+		love.graphics.print('win - by colorsCrimsonTears', 20, 400)
+		love.graphics.print('lose - by suntemple', 20, 420)
+		love.graphics.print('collecting veggies - by NenadSimic', 20, 440)
+		love.graphics.print('damaging chest - by Raclure', 20, 460)
 		love.graphics.print('background - Photo by Ferdinand Stöhr on unsplash.com', 20, 600)
 		love.graphics.print('village assets - by Cainos on itch.io', 20, 620)
 		love.graphics.print('bunny sprite - by felinoid on opengameart.org', 20, 640)
