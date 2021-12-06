@@ -355,33 +355,33 @@ function love.load()
     wait_music:setLooping(true)
     wait_music:play()
     
-   	background = love.graphics.newImage("ground_and_rabbit/background.png")
-	ground = love.graphics.newImage("ground_and_rabbit/ground.png")
-	empty = love.graphics.newImage("ground_and_rabbit/empty.png")
-	obst_img[1] = love.graphics.newImage("obstacles/thorns_80_25.png")
-	obst_img[2] = love.graphics.newImage("obstacles/bench_170_78.png")
-	obst_img[3] = love.graphics.newImage("obstacles/box_72_70.png")
-	obst_img[4] = love.graphics.newImage("obstacles/keg_58_75.png")
-	obst_img[5] = love.graphics.newImage("obstacles/pumpkin_66_70.png")
-	obst_img[6] = love.graphics.newImage("obstacles/sack_55_75.png")
-	obst_img[7] = love.graphics.newImage("obstacles/stump_57_50.png")
+   	background = love.graphics.newImage("images/ground_and_rabbit/background.png")
+	ground = love.graphics.newImage("images/ground_and_rabbit/ground.png")
+	empty = love.graphics.newImage("images/ground_and_rabbit/empty.png")
+	obst_img[1] = love.graphics.newImage("images/obstacles/thorns_80_25.png")
+	obst_img[2] = love.graphics.newImage("images/obstacles/bench_170_78.png")
+	obst_img[3] = love.graphics.newImage("images/obstacles/box_72_70.png")
+	obst_img[4] = love.graphics.newImage("images/obstacles/keg_58_75.png")
+	obst_img[5] = love.graphics.newImage("images/obstacles/pumpkin_66_70.png")
+	obst_img[6] = love.graphics.newImage("images/obstacles/sack_55_75.png")
+	obst_img[7] = love.graphics.newImage("images/obstacles/stump_57_50.png")
 	
-	veggies_img[1] = love.graphics.newImage("veggies/broccoli_26_24.png")
-	veggies_img[2] = love.graphics.newImage("veggies/cabbage_36_36.png")
-	veggies_img[3] = love.graphics.newImage("veggies/marrow_39_36.png")
-	veggies_img[4] = love.graphics.newImage("veggies/pepper_23_27.png")
-	veggies_img[5] = love.graphics.newImage("veggies/tomato_23_22.png")
+	veggies_img[1] = love.graphics.newImage("images/veggies/broccoli_26_24.png")
+	veggies_img[2] = love.graphics.newImage("images/veggies/cabbage_36_36.png")
+	veggies_img[3] = love.graphics.newImage("images/veggies/marrow_39_36.png")
+	veggies_img[4] = love.graphics.newImage("images/veggies/pepper_23_27.png")
+	veggies_img[5] = love.graphics.newImage("images/veggies/tomato_23_22.png")
 
-	backgr_img[1] = love.graphics.newImage("back_front/tree_300_300.png")
-	backgr_img[2] = love.graphics.newImage("back_front/wheat_170_90.png")
-	backgr_img[3] = love.graphics.newImage("back_front/clothes_170_130.png")
-	backgr_img[4] = love.graphics.newImage("back_front/sunflowers_170_90.png")
-	backgr_img[5] = love.graphics.newImage("back_front/scarecrow_109_150.png")
-	backgr_img[6] = love.graphics.newImage("back_front/streetlamp_90_205.png")
-	backgr_img[7] = love.graphics.newImage("back_front/bush_170_64.png")
+	backgr_img[1] = love.graphics.newImage("images/back_images/tree_300_300.png")
+	backgr_img[2] = love.graphics.newImage("images/back_images/wheat_170_90.png")
+	backgr_img[3] = love.graphics.newImage("images/back_images/clothes_170_130.png")
+	backgr_img[4] = love.graphics.newImage("images/back_images/sunflowers_170_90.png")
+	backgr_img[5] = love.graphics.newImage("images/back_images/scarecrow_109_150.png")
+	backgr_img[6] = love.graphics.newImage("images/back_images/streetlamp_90_205.png")
+	backgr_img[7] = love.graphics.newImage("images/back_images/bush_170_64.png")
 
 	-- ball = love.graphics.newImage("obstacles/ball_27_27.png")
-	rabbit = love.graphics.newImage("ground_and_rabbit/rabbit_anim_376_60.png")
+	rabbit = love.graphics.newImage("images/ground_and_rabbit/rabbit_anim_376_60.png")
 	rabbitAnim = {}
 	rabbitAnim[1] = love.graphics.newQuad(0, 0, 94, 60, rabbit:getDimensions())
 	rabbitAnim[2] = love.graphics.newQuad(94, 0, 94, 60, rabbit:getDimensions())
@@ -389,10 +389,10 @@ function love.load()
 	rabbitAnim[4] = love.graphics.newQuad(282, 0, 94, 60, rabbit:getDimensions())
 
 	chestAnim = {}
-	chestAnim[1] = love.graphics.newImage("chest/chest1_80_68.png")
-	chestAnim[2] = love.graphics.newImage("chest/chest2_80_78.png")
-	chestAnim[3] = love.graphics.newImage("chest/chest3_80_82.png")
-	chestAnim[4] = love.graphics.newImage("chest/chest4_80_87.png")
+	chestAnim[1] = love.graphics.newImage("images/chest/chest1_80_68.png")
+	chestAnim[2] = love.graphics.newImage("images/chest/chest2_80_78.png")
+	chestAnim[3] = love.graphics.newImage("images/chest/chest3_80_82.png")
+	chestAnim[4] = love.graphics.newImage("images/chest/chest4_80_87.png")
 	   
 	-- love.graphics.setFont(22)
 	font24 = love.graphics.newFont(24)
@@ -406,14 +406,14 @@ function love.load()
 	love.graphics.setDefaultFilter('nearest', 'nearest')
 	
 	ball = {
-		img = love.graphics.newImage("obstacles/ball_27_27.png"),
+		img = love.graphics.newImage("images/obstacles/ball_27_27.png"),
 		x = {4450, 5700, 6000, 6300, 6720, 8100, 8500, 9900, 10600, 16000},
 		y = 500,
 		status = {'off', 'off', 'off', 'off', 'off', 'off', 'off', 'off', 'off', 'off'},
 		timer = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 	}
 	carrot = {
-		img = love.graphics.newImage("carrot_50_19.png"),
+		img = love.graphics.newImage("images/veggies/carrot_50_19.png"),
 		width = 50,
 		height = 19,
 		x = rabbit_x - dx + 44,
