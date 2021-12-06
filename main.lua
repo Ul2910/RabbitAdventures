@@ -500,6 +500,13 @@ function love.draw()
 		love.graphics.draw(backgr_img[backgrounds[i].type], backgrounds[i].x, backgrounds[i].y)
 	end
 
+	-- If not all veggies collected
+	love.graphics.setColor(1,1,0)
+	if collectibles.got < collectibles.total then 
+		love.graphics.print('Collect all veggies to', 4350, 600) 
+		love.graphics.print('make the platform move!', 4350, 630) 
+	end
+
 	-- drawing obstacles
 	for i = 1, obst_counter do
 		love.graphics.setColor(1, 1, 1, obstacles[i].alpha)
@@ -782,6 +789,7 @@ end
 
 function platform_update()
 	local platform_delta = 0
+	if collectibles.got < collectibles.total then return 0 end
 	if platform.direction == 1 and platform.x + platform.width <= 5850 then
 		platform_delta = 5
 	elseif platform.direction == -1 and platform.x >= 4350 then
