@@ -1,10 +1,9 @@
 -- Map width is 100 tiles or 170 px * 100 = 17000 px
--- Platform is 20/100 or 170 px * 20 = 3400 px
+-- Platform area is 20/100 or 170 px * 20 = 3400 px
 -- Last part of the map is 5/100 or 170 px * 5 = 850 px
 
+state = 'start'
 totalTime = 0
-thorns_timer = 0
-thorns_direction = 1
 x = 0
 y = 630
 dx = 0
@@ -14,19 +13,17 @@ timer = 1
 direction = 1
 rabbit_y = 570
 rabbit_x = 0
-state = 'start'
 gravity = -600
-
+thorns_timer = 0
+thorns_direction = 1
 obst_img = {}
 veggies_img = {}
 backgr_img = {}
 obstacles = {}
 backgrounds = {}
-
 collectibles = {}
 collectibles.got = 0
 collectibles.total = 0
-
 
 function obstacles.create(type_num, map_num, map_height)
 	local this = {}
@@ -270,6 +267,8 @@ function backgrounds.create(type_num, map_num, map_height)
 	return this
 end
 
+
+-- If map height is 2, then we need to make sure that the previous obstacle is reachable (is not between two map tiles of height 2)
 function check_obst_reachable(i, obst_counter)
 	if obst_counter == 0 then return true end
 	if map[i-1] == 1 
@@ -281,6 +280,7 @@ function check_obst_reachable(i, obst_counter)
 		return true end
 end
 
+-- Randomly generating map, obstacles and background images
 function fill_map()
 	math.randomseed(os.time())
 	map = {}
@@ -314,11 +314,12 @@ function fill_map()
 		end
 	end
 
-	-- adding chest
+	-- Adding chest
 	obst_counter = obst_counter + 1
 	obstacles[obst_counter] = chest
 	middle = obstacles[obst_counter].x + math.floor(obstacles[obst_counter].width / 2)
 
+	-- Veggies inside the chest
 	for i = 1, 13 do
 		chest.veggies[i] = chest_veggies_create(math.random(5))
 		if i > 1 then chest.veggies[i].y = chest.veggies[i - 1].y + 40 end
@@ -423,6 +424,7 @@ function love.load()
 	fill_map()
 end
 
+-- Drawing the start screen
 function draw_start()	
 	love.graphics.draw(ground, 1110, 630)	
 	love.graphics.draw(ground, 940, 630)
@@ -451,12 +453,14 @@ end
 function love.draw()
 	love.graphics.setColor(1, 1, 1)
 	love.graphics.draw(background, 0, 0)
-	if state == 'start' then draw_start() return end
-	
+
+	if state == 'start' then draw_start() return end	
 	love.graphics.draw(background, 0, 0)
+
 	if state == 'walk' or state == 'jump' or state == 'fall' then changer() end
 	love.graphics.translate(dx, dy)
     
+    -- Drawing map
     for i = 1, 100 do
 	    if map[i] == 1 then
 	    	love.graphics.draw(ground, x, y)
@@ -468,22 +472,21 @@ function love.draw()
 	    end	   
 	    x = x + 170 
 	end
-
 	x = 0
 
-	-- drawing back images
+	-- Drawing back images
 	for i = 1, back_counter do
 		love.graphics.draw(backgr_img[backgrounds[i].type], backgrounds[i].x, backgrounds[i].y)
 	end
 
-	-- If not all veggies collected
+	-- Reminder in the platform area in case not all veggies collected
 	love.graphics.setColor(1,1,0)
 	if collectibles.got < collectibles.total then 
 		love.graphics.print('Collect all veggies to', 12850, 600) 
 		love.graphics.print('make the platform move!', 12850, 630) 
 	end
 
-	-- drawing obstacles
+	-- Drawing obstacles and veggies collected
 	for i = 1, obst_counter do
 		love.graphics.setColor(1, 1, 1, obstacles[i].alpha)
 		if i < obst_counter then
@@ -506,12 +509,12 @@ function love.draw()
 		if ball.status[i] == 'on' then love.graphics.draw(ball.img, ball.x[i], ball.y) end
 	end
 
-	-- drawing chest hp
+	--Ddrawing chest hp
 	love.graphics.setColor(0.8, 0, 0)
 	love.graphics.rectangle('fill', chest.x, 555 - chest.frame_height[chest.frame] - 20, 8 * chest.shots, 8)
 	love.graphics.rectangle('line', chest.x + 8 * chest.shots, 555 - chest.frame_height[chest.frame] - 19, 80 - 8 * chest.shots, 6)
 
-	-- platform drawing
+	-- Drawing platform
 	love.graphics.setColor(0.5, 0.3, 0.1)
 	love.graphics.rectangle('fill', platform.x, platform.y, platform.width, platform.height, 10, 10, 5)
 
@@ -521,6 +524,8 @@ function love.draw()
 
     love.graphics.translate(-dx, 0)
     if state == 'wait' or state == 'lose' then print_final_info()
+
+    -- Drawing rabbit and his carrot
     elseif carrot.state == 'on' then love.graphics.draw(carrot.img, carrot.x + 25, carrot.y, 0, carrot.direction, 1, 25, 0) end
     love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
     
@@ -530,6 +535,7 @@ function love.draw()
     love.graphics.print('Time: '..math.floor(totalTime), 1140, 5) 
 end
 
+-- Printing info in case of win/game over
 function print_final_info()
     love.graphics.setColor(1,1,0)
 	love.graphics.setFont(font26)
@@ -559,6 +565,7 @@ function print_final_info()
 	love.graphics.setColor(1, 1, 1)
 end
 
+-- Animation of the openning chest and its veggies
 function win_animation()
 	if chest.frame < 4 then
 		if chest.timer < 1 and chest.timer > 0.5 then chest.frame = 2
@@ -573,6 +580,7 @@ function win_animation()
 	end
 end
 
+-- Animation of moving thorns on the ground
 function thorns_animation(dt)
 	thorns_timer = thorns_timer + 20 * dt
 	if thorns_timer < 0 then return end
@@ -586,6 +594,7 @@ function thorns_animation(dt)
 	if thorns_timer > 26 then thorns_timer = -35 thorns_direction = thorns_direction * -1 end
 end
 
+-- Animation of the deadly balls and chest firing them
 function chest_and_balls_animation(dt)
 	for i = 1, 10 do 
 		if ball.status[i] == 'on' then
@@ -648,6 +657,7 @@ function love.update(dt)
 	end
 end
 
+-- Calculating the current ground level or 'y' under the rabbit
 function current_ground_y(current_rabbit_x)
 	local left_corner = math.floor(current_rabbit_x / 170 + 1)
 	local right_corner = math.floor((current_rabbit_x + 94) / 170 + 1)
@@ -669,11 +679,12 @@ function current_ground_y(current_rabbit_x)
 				if level2 > highest_obst then level2 = highest_obst end
 			end
 	end
-	-- Check if above platform
+	-- Check if the rabbit is above the platform
 	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and platform.y - 60 < level2 then level2 = platform.y - 60 end
 	return math.floor(math.min(level1, level2) + 0.5)
 end
 
+-- Checking if the rabbit is about to collide with obstacles or higher ground
 function is_obstacle(check_x)
 	local i = math.floor(check_x / 170 + 1)
 	if map[i] == 2 and math.floor(rabbit_y + 0.5) + 60 > 555 then return true
@@ -688,6 +699,7 @@ function is_obstacle(check_x)
 	return false
 end
 
+-- Calculating placement of rabbit, carrot, veggies and the system of coordinates
 function changer()
 	carrot_update()
 	veggies_update()
@@ -707,6 +719,7 @@ function changer()
 	end
 end
 
+-- If the rabbit falls of the platform and collides with it, the platform pushes him
 function platform_push_rabbit()
 	if platform.direction == 1 
 	and state == 'fall'
@@ -727,6 +740,7 @@ function platform_push_rabbit()
 	end
 end
 
+-- Animation of moving platform
 function platform_update()
 	local platform_delta = 0
 	if collectibles.got < collectibles.total then return 0 end
@@ -745,11 +759,13 @@ function platform_update()
 	end
 end
 
+-- Checking if the rabbit on platform or not
 function rabbit_on_platform(current_rabbit_x)
 	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and math.floor(rabbit_y + 0.5) + 60 == 550 then return true
 	else return false end
 end
 
+-- Animation of the carrot
 function carrot_update()
 	if carrot.state == 'off' then
 		carrot.distance = 300
@@ -765,6 +781,7 @@ function carrot_update()
 	end
 end
 
+-- Animation of the collected veggies
 function veggies_update()
 	for i = 1, obst_counter - 1 do
 		if obstacles[i].fireable == true then
@@ -781,6 +798,7 @@ function veggies_update()
 	end
 end
 
+-- Checking carrot collision and if it hits obstacles with veggies inside of them
 function carrot_collision(check_x)
 	if carrot.direction == -1 then check_x = check_x - 50 end
 	local i = math.floor(check_x / 170 + 1)
