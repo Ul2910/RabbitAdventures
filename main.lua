@@ -1,6 +1,10 @@
--- Map width is 100 tiles or 170 px * 100 = 17000 px
--- Platform area is 20/100 or 170 px * 20 = 3400 px
--- Last part of the map is 5/100 or 170 px * 5 = 850 px
+-- Author: Uliana Gubanova (github username: ul2910)
+
+--[[ 
+	Map width is 100 tiles or 170 px * 100 = 17000 px
+	Platform area is 20/100 or 170 px * 20 = 3400 px
+	Last part of the map is 5/100 or 170 px * 5 = 850 px 
+]]--
 
 state = 'start'
 totalTime = 0
@@ -174,31 +178,31 @@ function chest_veggies_create(type_num)
 	if type_num == 1 then
 		this = {
 			type = type_num,
-			x = math.random(6700, 6740),
+			x = math.random(16900, 16940),
 			y = 475
 		}
 	elseif type_num == 2 then
 		this = {
 			type = type_num,
-			x = math.random(6700, 6740),
+			x = math.random(16900, 16940),
 			y = 475
 		}
 	elseif type_num == 3 then
 		this = {
 			type = type_num,
-			x = math.random(6700, 6740),
+			x = math.random(16900, 16940),
 			y = 475
 		}
 	elseif type_num == 4 then
 		this = {
 			type = type_num,
-			x = math.random(6700, 6740),
+			x = math.random(16900, 16940),
 			y = 475
 		}
 	elseif type_num == 5 then
 		this = {
 			type = type_num,
-			x = math.random(6700, 6740),
+			x = math.random(16900, 16940),
 			y = 475
 		}
 	end
@@ -266,7 +270,6 @@ function backgrounds.create(type_num, map_num, map_height)
 	end
 	return this
 end
-
 
 -- If map height is 2, then we need to make sure that the previous obstacle is reachable (is not between two map tiles of height 2)
 function check_obst_reachable(i, obst_counter)
@@ -386,7 +389,7 @@ function love.load()
 	
 	ball = {
 		img = love.graphics.newImage("images/obstacles/ball_27_27.png"),
-		x = {16926, 5700, 6000, 6300, 6720, 8100, 8500, 9900, 10600, 16000},
+		x = {4000, 5700, 7000, 9300, 11720, 13100, 14500, 15900, 16600, 16926},
 		y = 500,
 		status = {'off', 'off', 'off', 'off', 'off', 'off', 'off', 'off', 'off', 'off'},
 		timer = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
@@ -505,7 +508,7 @@ function love.draw()
 
 	-- Drawing balls
 	love.graphics.setColor(1, 1, 1)
-	for i = 1, 10 do 
+	for i = 1, #ball.x do 
 		if ball.status[i] == 'on' then love.graphics.draw(ball.img, ball.x[i], ball.y) end
 	end
 
@@ -533,6 +536,45 @@ function love.draw()
     love.graphics.setColor(1,1,0)
     love.graphics.print('Veggies: '..math.floor(collectibles.got * 100 / collectibles.total + 0.5)..'%', 5, 5)
     love.graphics.print('Time: '..math.floor(totalTime), 1140, 5) 
+    if state ~= 'lose' then check_if_gameover() end
+end
+
+-- Checking if the rabbit hit thorns or flying balls
+function check_if_gameover()
+	local left_rabbit_x = rabbit_x - dx
+	local right_rabbit_x = rabbit_x - dx + 94
+	local upper_rabbit_y = math.floor(rabbit_y + 0.5)
+	local bottom_rabbit_y = math.floor(rabbit_y + 0.5) + 60
+	if bottom_rabbit_y >= 695 
+	or check_collision_with_thorns(left_rabbit_x, right_rabbit_x, bottom_rabbit_y) == true 
+	or check_collision_with_balls(left_rabbit_x, right_rabbit_x, upper_rabbit_y, bottom_rabbit_y) == true then 
+		state = 'lose' 
+		music:stop() 
+		lose_sound:play() 
+	end
+end
+
+function check_collision_with_thorns(left_rabbit_x, right_rabbit_x, bottom_rabbit_y)
+	for i = 1, obst_counter - 1 do
+		if obstacles[i].type == 1 and bottom_rabbit_y >= obstacles[i].y 
+		and ((left_rabbit_x >= obstacles[i].x and left_rabbit_x <= obstacles[i].x + obstacles[i].width)
+			or (right_rabbit_x >= obstacles[i].x and right_rabbit_x <= obstacles[i].x + obstacles[i].width)) then
+			return true
+		end
+	end
+	return false
+end
+
+function check_collision_with_balls(left_rabbit_x, right_rabbit_x, upper_rabbit_y, bottom_rabbit_y)
+	for i = 1, #ball.x do
+		if ((ball.x[i] > left_rabbit_x and ball.x[i] < right_rabbit_x)
+			or (ball.x[i] + 27 > left_rabbit_x and ball.x[i] + 27 < right_rabbit_x))
+		and ((ball.y > upper_rabbit_y and ball.y < bottom_rabbit_y) 
+			or (ball.y + 27 > upper_rabbit_y and ball.y + 27 < bottom_rabbit_y)) then
+			return true 
+		end
+	end
+	return false
 end
 
 -- Printing info in case of win/game over
@@ -596,7 +638,7 @@ end
 
 -- Animation of the deadly balls and chest firing them
 function chest_and_balls_animation(dt)
-	for i = 1, 10 do 
+	for i = 1, #ball.x do 
 		if ball.status[i] == 'on' then
 			ball.x[i] = math.floor(ball.x[i] - 350 * dt + 0.5)
 			if ball.x[i] < -26 then 
@@ -691,7 +733,7 @@ function is_obstacle(check_x)
 	elseif map[i] == 1 and math.floor(rabbit_y + 0.5) + 60 > 630 then return true
 	else
 		for i = 1, obst_counter do
-			if check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and math.floor(rabbit_y + 0.5) + 60 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then return true end
+			if obstacles[i].type ~= 1 and check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and math.floor(rabbit_y + 0.5) + 60 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then return true end
 		end
 		-- Check platform collision
 		if check_x >= platform.x and check_x <= platform.x + platform.width and math.floor(rabbit_y + 0.5) < platform.y + platform.height and math.floor(rabbit_y + 0.5) + 60 > platform.y then return true end
@@ -823,7 +865,7 @@ function carrot_collision(check_x)
 						music:stop()
 						win_sound:play()
 						chest.frame = 1 
-						for i = 1, 10 do ball.status[i] = 'off' end
+						for i = 1, #ball.x do ball.status[i] = 'off' end
 					end
 				end
 				return true 
