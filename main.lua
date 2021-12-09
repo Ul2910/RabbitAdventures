@@ -7,6 +7,10 @@
 ]]--
 
 state = 'start'
+lives_left = 3
+invulnerable = false
+invulnerable_timer = 2
+rabbit_alpha_counter = 0
 totalTime = 0
 x = 0
 y = 630
@@ -530,13 +534,22 @@ function love.draw()
 
     -- Drawing rabbit and his carrot
     elseif carrot.state == 'on' then love.graphics.draw(carrot.img, carrot.x + 25, carrot.y, 0, carrot.direction, 1, 25, 0) end
+    if invulnerable == true then
+    	rabbit_alpha_counter = rabbit_alpha_counter + 1
+    	if rabbit_alpha_counter > 5 and rabbit_alpha_counter < 11 then 
+    		love.graphics.setColor(1, 1, 1, 0.5)
+    	elseif rabbit_alpha_counter == 11 then 
+    		rabbit_alpha_counter = 0
+    	end
+    end
     love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
-    
+
     -- Printing info
     love.graphics.setColor(1,1,0)
     love.graphics.print('Veggies: '..math.floor(collectibles.got * 100 / collectibles.total + 0.5)..'%', 5, 5)
-    love.graphics.print('Time: '..math.floor(totalTime), 1140, 5) 
-    if state ~= 'lose' then check_if_gameover() end
+    love.graphics.print('Lives: '..lives_left, 5, 35) 
+    love.graphics.print('Time: '..math.floor(totalTime), 1140, 5)
+    if state ~= 'lose' and state ~= 'win' and state ~= 'wait' and invulnerable == false then check_if_gameover() end
 end
 
 -- Checking if the rabbit hit thorns or flying balls
@@ -548,9 +561,15 @@ function check_if_gameover()
 	if bottom_rabbit_y >= 695 
 	or check_collision_with_thorns(left_rabbit_x, right_rabbit_x, bottom_rabbit_y) == true 
 	or check_collision_with_balls(left_rabbit_x, right_rabbit_x, upper_rabbit_y, bottom_rabbit_y) == true then 
-		state = 'lose' 
-		music:stop() 
-		lose_sound:play() 
+		lives_left = lives_left - 1
+		if lives_left > 0 then 
+			lose_sound:play() 
+			invulnerable = true
+		else
+			state = 'lose' 
+			music:stop() 
+			lose_sound:play() 
+		end
 	end
 end
 
@@ -665,6 +684,10 @@ function love.update(dt)
 		if state == 'win' and chest.timer > 0 then chest.timer = chest.timer - 1 * dt end
 		return 
 	end
+	if invulnerable == true then 
+		invulnerable_timer = invulnerable_timer - 1 * dt
+		if invulnerable_timer < 0 then invulnerable_timer = 2 invulnerable = false end
+	end
 	totalTime = totalTime + 1 * dt
 	chest_and_balls_animation(dt)
 	thorns_animation(dt)
@@ -713,12 +736,14 @@ function current_ground_y(current_rabbit_x)
 	end
 	local level2 = level1
 	local highest_obst
-	for i = 1, obst_counter do
-			if (obstacles[i].x < current_rabbit_x + 94 and obstacles[i].x > current_rabbit_x)
-			 or (obstacles[i].x + obstacles[i].width < current_rabbit_x + 94 and obstacles[i].x + obstacles[i].width > current_rabbit_x) 
-			 or (obstacles[i].type == 2 and current_rabbit_x >= obstacles[i].x and current_rabbit_x + 94 <= obstacles[i].x + obstacles[i].width) then
-				highest_obst = obstacles[i].y + obstacles[i].height - obstacles[i].jump_height - 60
-				if level2 > highest_obst then level2 = highest_obst end
+	for i = 1, obst_counter - 1 do
+			if obstacles[i].type ~= 1 then
+				if (obstacles[i].x < current_rabbit_x + 94 and obstacles[i].x > current_rabbit_x)
+				 or (obstacles[i].x + obstacles[i].width < current_rabbit_x + 94 and obstacles[i].x + obstacles[i].width > current_rabbit_x) 
+				 or (obstacles[i].type == 2 and current_rabbit_x >= obstacles[i].x and current_rabbit_x + 94 <= obstacles[i].x + obstacles[i].width) then
+					highest_obst = obstacles[i].y + obstacles[i].height - obstacles[i].jump_height - 60
+					if level2 > highest_obst then level2 = highest_obst end
+				end
 			end
 	end
 	-- Check if the rabbit is above the platform
