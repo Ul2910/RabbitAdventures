@@ -12,6 +12,9 @@ invulnerable = false
 invulnerable_timer = 2
 rabbit_alpha_counter = 0
 totalTime = 0
+modes_range = {'for babies', 'easy', 'normal', 'hard', 'impossible'}
+mode_y = 450
+mode = 3
 x = 0
 y = 630
 dx = 0
@@ -435,7 +438,7 @@ end
 function draw_start()	
 	love.graphics.draw(ground, 1110, 630)	
 	love.graphics.draw(ground, 940, 630)
-	love.graphics.draw(rabbit, rabbitAnim[1], 593, 100)
+	love.graphics.draw(rabbit, rabbitAnim[1], 593, 50)
 	love.graphics.draw(backgr_img[5], 15, 570)
 	love.graphics.draw(backgr_img[4], 0, 630)	
 	love.graphics.draw(obst_img[5], 150, 650)
@@ -446,13 +449,21 @@ function draw_start()
 	love.graphics.draw(chestAnim[1], 1165, 562)
 	love.graphics.setColor(1,1,0)
 	love.graphics.setFont(font36)
-	love.graphics.print('RABBIT ADVENTURES', 445, 200)
+	love.graphics.print('RABBIT ADVENTURES', 445, 130)
 	love.graphics.setFont(font26)
-	love.graphics.print('Survive and collect all veggies!', 445, 240)
-	love.graphics.print('Arrows - move', 445, 300)
-	love.graphics.print('Space - jump', 445, 330)
-	love.graphics.print('B - throw carrots', 445, 360)
-	love.graphics.print('Press \'space\' to start', 445, 415)
+	love.graphics.print('Survive and collect all veggies!', 445, 170)
+	love.graphics.print('Arrows - move', 445, 220)
+	love.graphics.print('Space - jump', 445, 250)
+	love.graphics.print('B - throw carrots', 445, 280)
+	love.graphics.print('Mode:', 445, 330)
+	love.graphics.print('Press \'space\' to start', 445, 570)
+	love.graphics.setColor(1,1,0,0.5)
+	love.graphics.rectangle('fill', 445, mode_y, 150, 30, 10, 10, 5)
+	love.graphics.setColor(0.5,0.3,0.1)
+	love.graphics.setFont(font20)
+	for i = 1, 5 do
+		love.graphics.print(modes_range[i], 450, 332 + i * 40)
+	end	
 	love.graphics.setFont(font24)
 	love.graphics.setColor(1, 1, 1)
 end
@@ -545,10 +556,11 @@ function love.draw()
     love.graphics.draw(rabbit, rabbitAnim[rabbit_current_frame], rabbit_x + 47, math.floor(rabbit_y + 0.5), 0, direction, 1, 47, 0)
 
     -- Printing info
-    love.graphics.setColor(1,1,0)
-    love.graphics.print('Veggies: '..math.floor(collectibles.got * 100 / collectibles.total + 0.5)..'%', 5, 5)
+    love.graphics.setColor(1,1,0)    
+    love.graphics.print('Mode: '..modes_range[mode], 5, 5)
     love.graphics.print('Lives: '..lives_left, 5, 35) 
-    love.graphics.print('Time: '..math.floor(totalTime), 1140, 5)
+    love.graphics.print('Veggies: '..math.floor(collectibles.got * 100 / collectibles.total + 0.5)..'%', 1095, 5)
+    love.graphics.print('Time: '..math.floor(totalTime), 1095, 35)
     if state ~= 'lose' and state ~= 'win' and state ~= 'wait' and invulnerable == false then check_if_gameover() end
 end
 
@@ -907,6 +919,14 @@ function love.keypressed(key)
 		return
 	elseif (state == 'wait' or state == 'lose') and key == 'space' then 
 		love.event.quit("restart")
+	elseif state == 'start' and key == 'down' and mode_y < 530 then 
+		mode_y = mode_y + 40
+		mode = mode + 1
+		lives_left = lives_left - 1
+	elseif state == 'start' and key == 'up' and mode_y > 370 then 
+		mode_y = mode_y - 40
+		mode = mode - 1
+		lives_left = lives_left + 1
 	elseif state == 'start' and key == 'space' then 
 		state = 'walk'
 		wait_music:stop()
