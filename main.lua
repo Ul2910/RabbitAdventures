@@ -6,6 +6,12 @@
 	Last part of the map is 5/100 or 170 px * 5 = 850 px 
 ]]--
 
+require("map_creator")
+require("objects_creator")
+require("platform")
+require("objects_animation")
+require("win_or_gameover")
+
 state = 'start'
 lives_left = 3
 invulnerable = false
@@ -25,7 +31,7 @@ direction = 1
 rabbit_y = 570
 rabbit_x = 0
 gravity = -600
-thorns_timer = 0
+thorns_timer = 0  
 thorns_direction = 1
 obst_img = {}
 veggies_img = {}
@@ -35,306 +41,6 @@ backgrounds = {}
 collectibles = {}
 collectibles.got = 0
 collectibles.total = 0
-
-function obstacles.create(type_num, map_num, map_height)
-	local this = {}
-	if type_num == 1 then
-		this = {
-			type = type_num,
-			width = 80,
-			height = 25,
-			jump_height = 25,
-			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 20,		
-			fireable = false,
-			shots = 0,
-			alpha = 1
-		}
-	elseif type_num == 2 then
-		this = {
-			type = type_num,
-			width = 170,
-			height = 78,
-			jump_height = 30,
-			x = 170 * map_num - 170,
-			y = 630 - 75 * (map_height - 1) - 78,			
-			fireable = false,
-			shots = 0,
-			alpha = 1
-		}
-	elseif type_num == 3 then
-		this = {
-			type = type_num,
-			width = 72,
-			height = 70,
-			jump_height = 70,
-			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 70,			
-			fireable = false,
-			shots = 0,
-			alpha = 1
-		}
-	elseif type_num == 4 then
-		this = {
-			type = type_num,
-			width = 58,
-			height = 75,
-			jump_height = 75,
-			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 75,			
-			fireable = true,
-			shots = 3,
-			alpha = 1,
-			veggies = {}
-		}
-	elseif type_num == 5 then
-		this = {
-			type = type_num,
-			width = 66,
-			height = 70,
-			jump_height = 50,
-			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 70,			
-			fireable = true,
-			shots = 1,
-			alpha = 1,
-			veggies = {}
-		}
-	elseif type_num == 6 then
-		this = {
-			type = type_num,
-			width = 55,
-			height = 75,
-			jump_height = 75,
-			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 75,			
-			fireable = true,
-			shots = 2,
-			alpha = 1,
-			veggies = {}
-		}
-	elseif type_num == 7 then
-		this = {
-			type = type_num,
-			width = 57,
-			height = 50,
-			jump_height = 50,
-			x = 170 * map_num - 170 + 50,
-			y = 630 - 75 * (map_height - 1) - 50,			
-			fireable = false,
-			shots = 0,
-			alpha = 1
-		}
-	end
-	return this
-end
-
-function veggies_create(type_num, x, y)
-	local this = {}
-	if type_num == 1 then
-		this = {
-			type = type_num,
-			width = 26,
-			height = 24,
-			x = x - 13,
-			y = y - 24,			
-			state = 'off'
-		}
-	elseif type_num == 2 then
-		this = {
-			type = type_num,
-			width = 36,
-			height = 36,
-			x = x - 18,
-			y = y - 36,			
-			state = 'off'
-		}
-	elseif type_num == 3 then
-		this = {
-			type = type_num,
-			width = 39,
-			height = 36,
-			x = x - 19,
-			y = y - 36,			
-			state = 'off'
-		}
-	elseif type_num == 4 then
-		this = {
-			type = type_num,
-			width = 23,
-			height = 27,
-			x = x - 11,
-			y = y - 27,			
-			state = 'off'
-		}
-	elseif type_num == 5 then
-		this = {
-			type = type_num,
-			width = 23,
-			height = 22,
-			x = x - 11,
-			y = y - 22,			
-			state = 'off'
-		}
-	end
-	return this
-end
-
-function chest_veggies_create(type_num)
-	local this = {}
-	if type_num == 1 then
-		this = {
-			type = type_num,
-			x = math.random(16900, 16940),
-			y = 475
-		}
-	elseif type_num == 2 then
-		this = {
-			type = type_num,
-			x = math.random(16900, 16940),
-			y = 475
-		}
-	elseif type_num == 3 then
-		this = {
-			type = type_num,
-			x = math.random(16900, 16940),
-			y = 475
-		}
-	elseif type_num == 4 then
-		this = {
-			type = type_num,
-			x = math.random(16900, 16940),
-			y = 475
-		}
-	elseif type_num == 5 then
-		this = {
-			type = type_num,
-			x = math.random(16900, 16940),
-			y = 475
-		}
-	end
-	return this
-end
-
-function backgrounds.create(type_num, map_num, map_height)
-	local this = {}
-	if type_num == 1 then
-		this = {
-			type = type_num,
-			width = 300,
-			height = 300,
-			x = 170 * map_num - 170 - 65,
-			y = 630 - 75 * (map_height - 1) - 300	
-		}
-	elseif type_num == 2 then
-		this = {
-			type = type_num,
-			width = 170,
-			height = 90,
-			x = 170 * map_num - 170,
-			y = 630 - 75 * (map_height - 1) - 90		
-		}
-	elseif type_num == 3 then
-		this = {
-			type = type_num,
-			width = 170,
-			height = 130,
-			x = 170 * map_num - 170,
-			y = 630 - 75 * (map_height - 1) - 130	
-		}
-	elseif type_num == 4 then
-		this = {
-			type = type_num,
-			width = 170,
-			height = 90,
-			x = 170 * map_num - 170,
-			y = 630 - 75 * (map_height - 1) - 90	
-		}
-	elseif type_num == 5 then
-		this = {
-			type = type_num,
-			width = 109,
-			height = 150,
-			x = 170 * map_num - 100,
-			y = 630 - 75 * (map_height - 1) - 150	
-		}
-	elseif type_num == 6 then
-		this = {
-			type = type_num,
-			width = 90,
-			height = 205,
-			x = 170 * map_num - 170,
-			y = 630 - 75 * (map_height - 1) - 205	
-		}
-	elseif type_num == 7 then
-		this = {
-			type = type_num,
-			width = 170,
-			height = 64,
-			x = 170 * map_num - 170,
-			y = 630 - 75 * (map_height - 1) - 64	
-		}
-	end
-	return this
-end
-
--- If map height is 2, then we need to make sure that the previous obstacle is reachable (is not between two map tiles of height 2)
-function check_obst_reachable(i, obst_counter)
-	if obst_counter == 0 then return true end
-	if map[i-1] == 1 
-	and (i == 2 or map[i-2] == 2)
-	and obstacles[obst_counter].fireable == true 
-	and obstacles[obst_counter].x >= 170 * (i - 2) then 
-		return false
-	else
-		return true end
-end
-
--- Randomly generating map, obstacles and background images
-function fill_map()
-	math.randomseed(os.time())
-	map = {}
-	back = {}
-	obst_counter = 0
-	back_counter = 0
-	local middle = 0
-	for i = 1, 100 do
-		local rand = math.random(5)
-		if (i > 1 and i < 75 and rand == 1 and map[i-1] ~= 0) or (i > 75 and i < 96) then
-			map[i] = 0
-			back[i] = 0
-		elseif (i == 75 or (i > 1 and rand == 2) or i > 95) and check_obst_reachable(i, obst_counter) == true then
-		 	map[i] = 2
-		else
-			map[i] = 1
-		end
-		if map[i] == 1 or map[i] == 2 and math.random(3) > 1 then 
-			back_counter = back_counter + 1
-			backgrounds[back_counter] = backgrounds.create(math.random(7), i, map[i])
-		end
-		if (map[i] == 2 or map[i] == 1) and i > 1 and i < 75 and math.random(5) > 2 then
-			obst_counter = obst_counter + 1
-			obstacles[obst_counter] = obstacles.create(math.random(7), i, map[i])
-			if obstacles[obst_counter].type == 1 and obst_counter % 2 == 0 then obstacles[obst_counter].y = obstacles[obst_counter].y + 26 end
-			collectibles.total = collectibles.total + obstacles[obst_counter].shots
-			for i = 1, obstacles[obst_counter].shots do 
-				middle = obstacles[obst_counter].x + math.floor(obstacles[obst_counter].width / 2)
-				obstacles[obst_counter].veggies[i] = veggies_create(math.random(5), middle, obstacles[obst_counter].y) 
-			end
-		end
-	end
-
-	-- Adding chest
-	obst_counter = obst_counter + 1
-	obstacles[obst_counter] = chest
-	middle = obstacles[obst_counter].x + math.floor(obstacles[obst_counter].width / 2)
-
-	-- Veggies inside the chest
-	for i = 1, 13 do
-		chest.veggies[i] = chest_veggies_create(math.random(5))
-		if i > 1 then chest.veggies[i].y = chest.veggies[i - 1].y + 40 end
-	end
-end
 
 function love.load()
 	music = love.audio.newSource("sounds/416778__mativve__happy-sandbox.wav", 'static')
@@ -392,7 +98,6 @@ function love.load()
 	font14 = love.graphics.newFont(14)
 	font36 = love.graphics.newFont(36)
 	love.graphics.setFont(font24)
-	love.graphics.setDefaultFilter('nearest', 'nearest')
 	
 	ball = {
 		img = love.graphics.newImage("images/obstacles/ball_27_27.png"),
@@ -466,6 +171,53 @@ function draw_start()
 	end	
 	love.graphics.setFont(font24)
 	love.graphics.setColor(1, 1, 1)
+end
+
+function love.focus(f) gameIsPaused = not f end
+
+function love.update(dt)
+	if gameIsPaused then return end
+	dt = math.min(dt, 0.07)
+	if state == 'win' or state == 'wait' or state == 'lose' or state == 'start' then 
+		if state == 'win' and chest.timer > 0 then chest.timer = chest.timer - 1 * dt end
+		return 
+	end
+	if invulnerable == true then 
+		invulnerable_timer = invulnerable_timer - 1 * dt
+		if invulnerable_timer < 0 then invulnerable_timer = 2 invulnerable = false end
+	end
+	totalTime = totalTime + 1 * dt
+	chest_and_balls_animation(dt)
+	thorns_animation(dt)
+	if state == 'jump' or state == 'fall' then
+		rabbit_current_frame = 2
+		rabbit_y = rabbit_y + gravity * dt
+		if state == 'jump' then
+			curr_ground_y = current_ground_y(rabbit_x - dx) end
+		if gravity >= 0 and rabbit_y >= curr_ground_y then
+			state = 'walk'
+			rabbit_y = curr_ground_y
+		end
+	end
+	if love.keyboard.isDown("right") or love.keyboard.isDown("left") then
+		if love.keyboard.isDown("right") then direction = 1
+		elseif love.keyboard.isDown("left") then direction = -1 end
+		if state == 'walk' then
+			timer = timer + 6 * dt
+			if timer > 4 then timer = 1 end
+			rabbit_current_frame = math.floor(timer + 0.5)
+			curr_ground_y = current_ground_y(rabbit_x - dx)
+			if curr_ground_y > rabbit_y then 
+				gravity = 0
+				state = 'fall'
+			end
+		end		
+	else
+		if state == 'walk' then
+			timer = 1
+			rabbit_current_frame = 1
+		end
+	end
 end
 
 function love.draw()
@@ -562,354 +314,6 @@ function love.draw()
     love.graphics.print('Veggies: '..math.floor(collectibles.got * 100 / collectibles.total + 0.5)..'%', 1095, 5)
     love.graphics.print('Time: '..math.floor(totalTime), 1095, 35)
     if state ~= 'lose' and state ~= 'win' and state ~= 'wait' and invulnerable == false then check_if_gameover() end
-end
-
--- Checking if the rabbit hit thorns or flying balls
-function check_if_gameover()
-	local left_rabbit_x = rabbit_x - dx
-	local right_rabbit_x = rabbit_x - dx + 94
-	local upper_rabbit_y = math.floor(rabbit_y + 0.5)
-	local bottom_rabbit_y = math.floor(rabbit_y + 0.5) + 60
-	if bottom_rabbit_y >= 695 
-	or check_collision_with_thorns(left_rabbit_x, right_rabbit_x, bottom_rabbit_y) == true 
-	or check_collision_with_balls(left_rabbit_x, right_rabbit_x, upper_rabbit_y, bottom_rabbit_y) == true then 
-		lives_left = lives_left - 1
-		if lives_left > 0 then 
-			lose_sound:play() 
-			invulnerable = true
-		else
-			state = 'lose' 
-			music:stop() 
-			lose_sound:play() 
-		end
-	end
-end
-
-function check_collision_with_thorns(left_rabbit_x, right_rabbit_x, bottom_rabbit_y)
-	for i = 1, obst_counter - 1 do
-		if obstacles[i].type == 1 and bottom_rabbit_y >= obstacles[i].y 
-		and ((left_rabbit_x >= obstacles[i].x and left_rabbit_x <= obstacles[i].x + obstacles[i].width)
-			or (right_rabbit_x >= obstacles[i].x and right_rabbit_x <= obstacles[i].x + obstacles[i].width)) then
-			return true
-		end
-	end
-	return false
-end
-
-function check_collision_with_balls(left_rabbit_x, right_rabbit_x, upper_rabbit_y, bottom_rabbit_y)
-	for i = 1, #ball.x do
-		if ((ball.x[i] > left_rabbit_x and ball.x[i] < right_rabbit_x)
-			or (ball.x[i] + 27 > left_rabbit_x and ball.x[i] + 27 < right_rabbit_x))
-		and ((ball.y > upper_rabbit_y and ball.y < bottom_rabbit_y) 
-			or (ball.y + 27 > upper_rabbit_y and ball.y + 27 < bottom_rabbit_y)) then
-			return true 
-		end
-	end
-	return false
-end
-
--- Printing info in case of win/game over
-function print_final_info()
-    love.graphics.setColor(1,1,0)
-	love.graphics.setFont(font26)
-	love.graphics.print('Press \'space\' to play again', 480, 220)
-	if state == 'lose' then love.graphics.print('GAME OVER!', 560, 160)
-	else 
-		love.graphics.print('WIN!', 600, 160) 
-		love.graphics.setFont(font20)
-		love.graphics.print('Developed by Uliana (github: ul2910)', 880, 670)
-		love.graphics.setColor(0.5,0.3,0.1)
-		love.graphics.print('Art:', 20, 565)
-		love.graphics.print('Music and sounds - from freesound.org:', 20, 305)
-		love.graphics.setFont(font14)
-		love.graphics.print('menu music - by Slaking_97', 20, 340)
-		love.graphics.print('main theme - by Mativve', 20, 360)
-		love.graphics.print('jump - by cabled_mess', 20, 380)
-		love.graphics.print('win - by colorsCrimsonTears', 20, 400)
-		love.graphics.print('lose - by suntemple', 20, 420)
-		love.graphics.print('collecting veggies - by NenadSimic', 20, 440)
-		love.graphics.print('damaging chest - by Raclure', 20, 460)
-		love.graphics.print('background - Photo by Ferdinand Stöhr on unsplash.com', 20, 600)
-		love.graphics.print('village assets - by Cainos on itch.io', 20, 620)
-		love.graphics.print('bunny sprite - by felinoid on opengameart.org', 20, 640)
-		love.graphics.print('vegetables - by ScratchIO on opengameart.org', 20, 660)
-	end
-	love.graphics.setFont(font24)
-	love.graphics.setColor(1, 1, 1)
-end
-
--- Animation of the openning chest and its veggies
-function win_animation()
-	if chest.frame < 4 then
-		if chest.timer < 1 and chest.timer > 0.5 then chest.frame = 2
-		elseif chest.timer < 0.5 and chest.timer > 0 then chest.frame = 3
-		elseif chest.timer < 0 then chest.frame = 4 state = 'wait' wait_music:play() end
-	else
-		for i = 1, 13 do
-			if chest.veggies[i].y <= 475 then love.graphics.draw(veggies_img[chest.veggies[i].type], chest.veggies[i].x, chest.veggies[i].y) end
-			chest.veggies[i].y = chest.veggies[i].y - 3
-			if chest.veggies[i].y < -40 then chest.veggies[i].y = 475 end
-		end
-	end
-end
-
--- Animation of moving thorns on the ground
-function thorns_animation(dt)
-	thorns_timer = thorns_timer + 20 * dt
-	if thorns_timer < 0 then return end
-	for i = 1, obst_counter do
-		if obstacles[i].type == 1 and i % 2 == 0 then 
-			obstacles[i].y = obstacles[i].y - thorns_direction * 20 * dt
-		elseif obstacles[i].type == 1 and i % 2 == 1 then 
-			obstacles[i].y = obstacles[i].y + thorns_direction * 20 * dt
-		end
-	end
-	if thorns_timer > 26 then thorns_timer = -35 thorns_direction = thorns_direction * -1 end
-end
-
--- Animation of the deadly balls and chest firing them
-function chest_and_balls_animation(dt)
-	for i = 1, #ball.x do 
-		if ball.status[i] == 'on' then
-			ball.x[i] = math.floor(ball.x[i] - 350 * dt + 0.5)
-			if ball.x[i] < -26 then 
-				ball.status[i] = 'off' 
-				ball.x[i] = 16926 
-			end
-			if ball.timer[i] < 1 then 
-				ball.timer[i] = ball.timer[i] - 1 * dt
-				if ball.timer[i] < 0 then 
-					ball.timer[i] = 1 
-					chest.frame = 1
-				end
-			end
-		elseif ball.status[i] == 'off' then
-			chest.frame = 2
-			ball.timer[i] = ball.timer[i] - 1 * dt
-			if ball.timer[i] < 0.5 then ball.status[i] = 'on' end
-		end
-	end
-end
-
-function love.update(dt)
-	if state == 'win' or state == 'wait' or state == 'lose' or state == 'start' then 
-		if state == 'win' and chest.timer > 0 then chest.timer = chest.timer - 1 * dt end
-		return 
-	end
-	if invulnerable == true then 
-		invulnerable_timer = invulnerable_timer - 1 * dt
-		if invulnerable_timer < 0 then invulnerable_timer = 2 invulnerable = false end
-	end
-	totalTime = totalTime + 1 * dt
-	chest_and_balls_animation(dt)
-	thorns_animation(dt)
-	if state == 'jump' or state == 'fall' then
-		rabbit_current_frame = 2
-		rabbit_y = rabbit_y + gravity * dt
-		if state == 'jump' then
-			curr_ground_y = current_ground_y(rabbit_x - dx) end
-		if gravity >= 0 and rabbit_y >= curr_ground_y then
-			state = 'walk'
-			rabbit_y = curr_ground_y
-		end
-	end
-	if love.keyboard.isDown("right") or love.keyboard.isDown("left") then
-		if love.keyboard.isDown("right") then direction = 1
-		elseif love.keyboard.isDown("left") then direction = -1 end
-		if state == 'walk' then
-			timer = timer + 6 * dt
-			if timer > 4 then timer = 1 end
-			rabbit_current_frame = math.floor(timer + 0.5)
-			curr_ground_y = current_ground_y(rabbit_x - dx)
-			if curr_ground_y > rabbit_y then 
-				gravity = 0
-				state = 'fall'
-			end
-		end		
-	else
-		if state == 'walk' then
-			timer = 1
-			rabbit_current_frame = 1
-		end
-	end
-end
-
--- Calculating the current ground level or 'y' under the rabbit
-function current_ground_y(current_rabbit_x)
-	local left_corner = math.floor(current_rabbit_x / 170 + 1)
-	local right_corner = math.floor((current_rabbit_x + 94) / 170 + 1)
-	local level1 = 660
-	if map[left_corner] == 0 and map[right_corner] == 0 and right_corner < 75 then
-		return 660
-	elseif map[left_corner] == 2 or map[right_corner] == 2 then
-		level1 = 495
-	elseif map[left_corner] == 1 or map[right_corner] == 1 then
-		level1 = 570
-	end
-	local level2 = level1
-	local highest_obst
-	for i = 1, obst_counter - 1 do
-			if obstacles[i].type ~= 1 then
-				if (obstacles[i].x < current_rabbit_x + 94 and obstacles[i].x > current_rabbit_x)
-				 or (obstacles[i].x + obstacles[i].width < current_rabbit_x + 94 and obstacles[i].x + obstacles[i].width > current_rabbit_x) 
-				 or (obstacles[i].type == 2 and current_rabbit_x >= obstacles[i].x and current_rabbit_x + 94 <= obstacles[i].x + obstacles[i].width) then
-					highest_obst = obstacles[i].y + obstacles[i].height - obstacles[i].jump_height - 60
-					if level2 > highest_obst then level2 = highest_obst end
-				end
-			end
-	end
-	-- Check if the rabbit is above the platform
-	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and platform.y - 60 < level2 then level2 = platform.y - 60 end
-	return math.floor(math.min(level1, level2) + 0.5)
-end
-
--- Checking if the rabbit is about to collide with obstacles or higher ground
-function is_obstacle(check_x)
-	local i = math.floor(check_x / 170 + 1)
-	if map[i] == 2 and math.floor(rabbit_y + 0.5) + 60 > 555 then return true
-	elseif map[i] == 1 and math.floor(rabbit_y + 0.5) + 60 > 630 then return true
-	else
-		for i = 1, obst_counter do
-			if obstacles[i].type ~= 1 and check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and math.floor(rabbit_y + 0.5) + 60 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then return true end
-		end
-		-- Check platform collision
-		if check_x >= platform.x and check_x <= platform.x + platform.width and math.floor(rabbit_y + 0.5) < platform.y + platform.height and math.floor(rabbit_y + 0.5) + 60 > platform.y then return true end
-	end
-	return false
-end
-
--- Calculating placement of rabbit, carrot, veggies and the system of coordinates
-function changer()
-	carrot_update()
-	veggies_update()
-	local platform_distance = platform_update()
-	
-	if state == 'jump' or state == 'fall' then gravity = gravity + 25 end
-	if state == 'fall' then dx = dx + platform_push_rabbit() return end
-	if love.keyboard.isDown("left") and dx + 5 <= 0 and rabbit_x == 590 and is_obstacle(rabbit_x - (dx + 4)) == false then
-		dx = dx + 5 - platform_distance * platform.direction
-	elseif love.keyboard.isDown("left") and rabbit_x - 5 >= 0 and is_obstacle(rabbit_x - dx - 4) == false then
-		rabbit_x = rabbit_x - 5
-	elseif love.keyboard.isDown("right") and dx - 5 >= -15720 and rabbit_x == 590 and is_obstacle(rabbit_x + 94 - (dx - 4 - platform_distance * platform.direction)) == false then
-		dx = dx - 5 - platform_distance * platform.direction
-	elseif love.keyboard.isDown("right") and rabbit_x + 5 <= 1186 and is_obstacle(rabbit_x + 94 - dx + 4) == false then
-		rabbit_x = rabbit_x + 5
-	else dx = dx - platform_distance * platform.direction
-	end
-end
-
--- If the rabbit falls of the platform and collides with it, the platform pushes him
-function platform_push_rabbit()
-	if platform.direction == 1 
-	and state == 'fall'
-	and platform.x + platform.width >= rabbit_x - dx 
-	and platform.x + platform.width < rabbit_x - dx + 94 
-	and math.floor(rabbit_y + 0.5) + 60 >= platform.y
-	and math.floor(rabbit_y + 0.5) <= platform.y + platform.height then
-		return -5
-	elseif platform.direction == -1 
-	and state == 'fall'
-	and platform.x > rabbit_x - dx 
-	and platform.x <= rabbit_x - dx + 94 
-	and math.floor(rabbit_y + 0.5) + 60 >= platform.y
-	and math.floor(rabbit_y + 0.5) <= platform.y + platform.height then
-		return 5
-	else
-		return 0
-	end
-end
-
--- Animation of moving platform
-function platform_update()
-	local platform_delta = 0
-	if collectibles.got < collectibles.total then return 0 end
-	if platform.direction == 1 and platform.x + platform.width <= 16050 then
-		platform_delta = 5
-	elseif platform.direction == -1 and platform.x >= 12850 then
-		platform_delta = 5
-	else
-		platform.direction = platform.direction * -1
-	end
-	platform.x = platform.x + platform_delta * platform.direction
-	if rabbit_on_platform(rabbit_x - dx) == false then 
-		return 0 
-	else
-		return platform_delta
-	end
-end
-
--- Checking if the rabbit on platform or not
-function rabbit_on_platform(current_rabbit_x)
-	if current_rabbit_x + 94 > platform.x and current_rabbit_x < platform.x + platform.width and math.floor(rabbit_y + 0.5) + 60 == 550 then return true
-	else return false end
-end
-
--- Animation of the carrot
-function carrot_update()
-	if carrot.state == 'off' then
-		carrot.distance = 300
-		carrot.direction = direction
-	    carrot.y = math.floor(rabbit_y + 0.5) + 25
-	    if carrot.direction == -1 then carrot.x = rabbit_x
-	    else carrot.x = rabbit_x + 44 end
-	else
-		if carrot.direction == 1 then carrot.x = carrot.x + 7
-		else carrot.x = carrot.x - 7 end
-		carrot.distance = carrot.distance - 7
-		if carrot.distance < -7 or carrot_collision(carrot.x - dx + 50) == true then carrot.state = 'off' end
-	end
-end
-
--- Animation of the collected veggies
-function veggies_update()
-	for i = 1, obst_counter - 1 do
-		if obstacles[i].fireable == true then
-			local j = 1
-			while j <= #obstacles[i].veggies and obstacles[i].veggies[j].status == 'on' do
-				obstacles[i].veggies[j].y = obstacles[i].veggies[j].y - 3 
-				if obstacles[i].y - obstacles[i].veggies[j].y > 250 then
-					table.remove(obstacles[i].veggies, j)
-					j = j - 1
-				end
-				j = j + 1
-			end
-		end
-	end
-end
-
--- Checking carrot collision and if it hits obstacles with veggies inside of them
-function carrot_collision(check_x)
-	if carrot.direction == -1 then check_x = check_x - 50 end
-	local i = math.floor(check_x / 170 + 1)
-	if map[i] == 2 and carrot.y + 19 > 555 then return true
-	elseif map[i] == 1 and carrot.y + 19 > 630 then return true
-	else
-		for i = 1, obst_counter do
-			if check_x >= obstacles[i].x and check_x <= obstacles[i].x + obstacles[i].width and carrot.y + 19 > obstacles[i].y + obstacles[i].height - obstacles[i].jump_height then 
-				if obstacles[i].fireable == true and obstacles[i].shots > 0 and i < obst_counter then 
-					carrot_sound:play()
-					local j = 1
-					while j <= #obstacles[i].veggies and obstacles[i].veggies[j].status == 'on' do j = j + 1 end
-					obstacles[i].veggies[j].status = 'on'
-					obstacles[i].shots = obstacles[i].shots - 1
-					collectibles.got = collectibles.got + 1
-					if obstacles[i].shots == 0 then obstacles[i].alpha = 0.8 end
-				elseif i == obst_counter and obstacles[i].shots > 0 then 
-					obstacles[i].shots = obstacles[i].shots - 1
-					chest_dmg_sound:play()
-					if obstacles[i].shots == 0 then 
-						state = 'win' 
-						music:stop()
-						win_sound:play()
-						chest.frame = 1 
-						for i = 1, #ball.x do ball.status[i] = 'off' end
-					end
-				end
-				return true 
-			end
-		end
-	end
-	return false
 end
 
 function love.keypressed(key)
