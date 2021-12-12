@@ -13,13 +13,13 @@ The goal is to collect all veggies before reaching the moving platform, get to t
   
 #### Screenshots:
 
-![StarterScreen](Screenshots/StarterScreen.png)
+![StarterScreen](screenshots/StarterScreen.png)
 
-![GameplayScreen](Screenshots/GameplayScreen.png)
+![GameplayScreen](screenshots/GameplayScreen.png)
 
-![GameOverScreen](Screenshots/GameOverScreen.png)
+![GameOverScreen](screenshots/GameOverScreen.png)
 
-![WinScreen](Screenshots/WinScreen.png)
+![WinScreen](screenshots/WinScreen.png)
   
 #### Contents:
 - main.lua - contains callback functions		
