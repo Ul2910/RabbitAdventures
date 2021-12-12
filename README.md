@@ -5,6 +5,15 @@
 #### Description:
 Map, number of obstacles, back images and their placement are randomly generated each time the game is launched (except for moving platform and chest area). Ground has 2 height levels. The main hero, rabbit, can throw carrots ('B' key) to collect veggies, contained in some obstacles (not every obstacle contains them). Player can choose level of difficulty that depends on the number of lives (from 1 to 5). Deadly objects are thorns and flying balls. When the rabbit loses one life it becomes invulnerable for a couple of seconds. The goal is to collect all veggies before reaching the moving platform, get to the other side using the platform, fight with the chest and survive of course.   
   
+#### Screenshots:
+<img width="1279" alt="Screen Shot 2021-12-12 at 12 54 56 PM" src="https://user-images.githubusercontent.com/75734396/145708093-8eab496b-fbbe-4f08-ab7b-be047ad93008.png">
+  
+<img width="1275" alt="Screen Shot 2021-12-12 at 12 57 08 PM" src="https://user-images.githubusercontent.com/75734396/145708096-edcad01d-5d92-4531-8b2b-d16412ceddd2.png">
+  
+<img width="1272" alt="Screen Shot 2021-12-12 at 12 58 13 PM" src="https://user-images.githubusercontent.com/75734396/145708097-b35e896d-fb40-4c06-a11b-1a3effd92807.png">
+  
+<img width="1274" alt="Screen Shot 2021-12-12 at 1 01 10 PM" src="https://user-images.githubusercontent.com/75734396/145708099-8e29caff-53c4-4ce7-9ff6-eaab5d11a0c3.png">  
+  
 #### Contents:
 - main.lua - contains callback functions		
 - conf.lua - some configuration options such as window size, title; some modules set unused to reduce memory usage
