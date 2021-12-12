@@ -21,3 +21,6 @@ Deadly objects are thorns and flying balls.
 When the rabbit loses one life it becomes invulnerable for a couple of seconds. 
 The goal is to collect all veggies before reaching the moving platform, 
 get to the other side using the platform, fight with the chest and survive of course.
+
+Thank you for watching and a huge huge thanks to David and everyone from CS50!
+THIS was my final project.
