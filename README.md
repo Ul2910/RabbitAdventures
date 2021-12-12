@@ -3,7 +3,13 @@
 
 #### Video Demo:  <URL HERE>
 #### Description:
-Map, number of obstacles, back images and their placement are randomly generated each time the game is launched (except for moving platform and chest area). Ground has 2 height levels. The main hero, rabbit, can throw carrots ('B' key) to collect veggies, contained in some obstacles (not every obstacle contains them). Player can choose level of difficulty that depends on the number of lives (from 1 to 5). Deadly objects are thorns and flying balls. When the rabbit loses one life it becomes invulnerable for a couple of seconds. The goal is to collect all veggies before reaching the moving platform, get to the other side using the platform, fight with the chest and survive of course.   
+Map, number of obstacles, back images and their placement are randomly generated each time the game is launched (except for moving platform and chest area). Ground has 2 height levels. 
+  
+The main hero, rabbit, can throw carrots ('B' key) to collect veggies, contained in some obstacles (not every obstacle contains them). 
+  
+Player can choose level of difficulty that depends on the number of lives (from 1 to 5). Deadly objects are thorns and flying balls. When the rabbit loses one life it becomes invulnerable for a couple of seconds. 
+  
+The goal is to collect all veggies before reaching the moving platform, get to the other side using the platform, fight with the chest and survive of course! 
   
 #### Screenshots:
 <img width="1279" alt="Screen Shot 2021-12-12 at 12 54 56 PM" src="https://user-images.githubusercontent.com/75734396/145708093-8eab496b-fbbe-4f08-ab7b-be047ad93008.png">
