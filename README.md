@@ -13,3 +13,4 @@ Map, number of obstacles, back images and their placement are randomly generated
 - objects_animation.lua	- calculations of different animations: carrot, veggies, flying balls, thorns, moving system of coordinates; checking if colliding with an obstacle; calculating current ground level under the rabbit
 - win_or_gameover.lua - checking if game is over and printing lose/win info
 - objects_creator.lua - creation of objects: obstacles, back images, veggies (based on the random number passed)
+- credits.txt - art, music/sounds credits
