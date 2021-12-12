@@ -10,7 +10,7 @@ Map, number of obstacles, back images and their placement are randomly generated
   
 <img width="1275" alt="Screen Shot 2021-12-12 at 12 57 08 PM" src="https://user-images.githubusercontent.com/75734396/145708096-edcad01d-5d92-4531-8b2b-d16412ceddd2.png">
   
-<img width="1272" alt="Screen Shot 2021-12-12 at 12 58 13 PM" src="https://user-images.githubusercontent.com/75734396/145708097-b35e896d-fb40-4c06-a11b-1a3effd92807.png">
+<img width="1273" alt="Screen Shot 2021-12-12 at 1 04 42 PM" src="https://user-images.githubusercontent.com/75734396/145708179-9eddcc82-7904-4123-82b4-32f7ac35ba20.png">
   
 <img width="1274" alt="Screen Shot 2021-12-12 at 1 01 10 PM" src="https://user-images.githubusercontent.com/75734396/145708099-8e29caff-53c4-4ce7-9ff6-eaab5d11a0c3.png">  
   
