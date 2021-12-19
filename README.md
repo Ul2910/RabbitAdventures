@@ -1,7 +1,7 @@
 # RabbitAdventures
 ### Platformer game in Lua with LÖVE
 
-#### Video Demo:  <URL HERE>
+#### Video Demo:  https://youtu.be/SocWzQXZv3s
 #### Description:
 Map, number of obstacles, back images and their placement are randomly generated each time the game is launched (except for moving platform and chest area). Ground has 2 height levels. 
   
